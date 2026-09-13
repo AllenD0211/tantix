@@ -9,12 +9,18 @@ import {
   Target,
   Percent,
 } from 'lucide-react';
-import type { CalculationResult, ForexInputs } from '../../types/calculator';
+import type { CalculationResult } from '../../types/calculator';
 import { formatCurrency, formatPips, formatRatio } from '../../utils/formatting';
+import {
+  getInstrumentSymbol,
+  getPositionUnitLabel,
+  getPriceDecimals,
+  type ActiveCalculatorInputs,
+} from '../../utils/instrumentDisplay';
 
 interface TradeAnalysisChartProps {
   result: CalculationResult;
-  inputs: ForexInputs;
+  inputs: ActiveCalculatorInputs;
 }
 
 export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, inputs }) => {
@@ -32,6 +38,9 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
     takeProfitDistancePips,
   } = result;
 
+  const symbol = getInstrumentSymbol(inputs);
+  const priceDecimals = getPriceDecimals(inputs);
+  const unitLabel = getPositionUnitLabel(inputs);
   const hasSl = inputs.stopLossPrice && inputs.stopLossPrice > 0;
   const hasTp = inputs.takeProfitPrice && inputs.takeProfitPrice > 0;
 
@@ -69,11 +78,11 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
                 }`}
               >
                 {direction === 'BUY' ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                {direction} {inputs.pair}
+                {direction} {symbol}
               </span>
             </div>
             <p className="text-xs text-[var(--neu-text-muted)] font-mono-numbers mt-0.5">
-              Position: {inputs.lotSize} Lots ({result.positionSizeUnits.toLocaleString()} units) • Leverage 1:{inputs.leverage}
+              Position: {inputs.lotSize} Lots ({result.positionSizeUnits.toLocaleString()} {unitLabel}) • Leverage 1:{inputs.leverage}
             </p>
           </div>
         </div>
@@ -193,7 +202,7 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
         <div className="flex items-center justify-between text-xs text-[var(--neu-text-muted)]">
           <span className="font-semibold uppercase tracking-wider text-[10px]">Price Ladder Map</span>
           <span className="font-mono-numbers text-[11px]">
-            Pip Scale ({findPairDigitInfo(inputs.pair)} decimals)
+            Pip Scale ({priceDecimals} decimals)
           </span>
         </div>
 
@@ -208,7 +217,7 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
             </div>
             <div className="text-right">
               <div className="font-bold text-[var(--neu-text-primary)]">
-                {inputs.takeProfitPrice ? inputs.takeProfitPrice.toFixed(inputs.pair.includes('JPY') ? 3 : 5) : 'Not Set'}
+                {inputs.takeProfitPrice ? inputs.takeProfitPrice.toFixed(priceDecimals) : 'Not Set'}
               </div>
               {takeProfitDistancePips !== null && (
                 <div className="text-[10px] text-[var(--accent-emerald)]">
@@ -228,7 +237,7 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
             </div>
             <div className="text-right">
               <div className="font-bold text-[var(--neu-text-primary)] text-sm">
-                {inputs.entryPrice.toFixed(inputs.pair.includes('JPY') ? 3 : 5)}
+                {inputs.entryPrice.toFixed(priceDecimals)}
               </div>
               <div className="text-[10px] text-[var(--neu-text-muted)]">
                 Direction: {direction}
@@ -246,7 +255,7 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
             </div>
             <div className="text-right">
               <div className="font-bold text-[var(--neu-text-primary)]">
-                {inputs.stopLossPrice ? inputs.stopLossPrice.toFixed(inputs.pair.includes('JPY') ? 3 : 5) : 'Not Set'}
+                {inputs.stopLossPrice ? inputs.stopLossPrice.toFixed(priceDecimals) : 'Not Set'}
               </div>
               {stopLossDistancePips !== null && (
                 <div className="text-[10px] text-[var(--accent-rose)]">
@@ -272,7 +281,3 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
     </div>
   );
 };
-
-function findPairDigitInfo(pair: string): number {
-  return pair.includes('JPY') ? 3 : 5;
-}

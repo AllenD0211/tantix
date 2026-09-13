@@ -8,16 +8,18 @@ import {
   Activity,
   Layers,
 } from 'lucide-react';
-import type { CalculationResult, ForexInputs } from '../../types/calculator';
+import type { CalculationResult } from '../../types/calculator';
 import { formatCurrency, formatPips, formatRatio } from '../../utils/formatting';
+import { getPositionUnitLabel, type ActiveCalculatorInputs } from '../../utils/instrumentDisplay';
 
 interface ResultSummaryProps {
   result: CalculationResult;
-  inputs: ForexInputs;
+  inputs: ActiveCalculatorInputs;
 }
 
 export const ResultSummary: React.FC<ResultSummaryProps> = ({ result, inputs }) => {
   const isHealthyMargin = result.freeMarginRemaining > 0;
+  const unitLabel = getPositionUnitLabel(inputs);
 
   return (
     <div className="neu-raised-card p-5 sm:p-6 space-y-5 border border-[var(--neu-border-subtle)]">

@@ -5,6 +5,7 @@ import type {
   InstrumentType,
 } from '../../types/calculator';
 import { forexCalculator } from './forexCalculator';
+import { goldCalculator } from './goldCalculator';
 
 export const SUPPORTED_INSTRUMENTS: InstrumentSpec[] = [
   {
@@ -21,7 +22,7 @@ export const SUPPORTED_INSTRUMENTS: InstrumentSpec[] = [
     description: 'Spot Gold (XAU/USD) & Silver (XAG/USD)',
     standardLotUnit: '100 Troy Ounces',
     standardLotSize: 100,
-    supported: false, // Phase 2
+    supported: true,
   },
   {
     id: 'stocks',
@@ -56,6 +57,8 @@ export function calculateTrade(inputs: CalculatorInputs): CalculationResult {
   switch (inputs.instrumentType) {
     case 'forex':
       return forexCalculator.calculate(inputs);
+    case 'gold':
+      return goldCalculator.calculate(inputs);
     default:
       throw new Error(`Calculation engine for instrument '${inputs.instrumentType}' is not yet activated.`);
   }
@@ -68,6 +71,8 @@ export function validateInputs(inputs: CalculatorInputs): Record<string, string>
   switch (inputs.instrumentType) {
     case 'forex':
       return forexCalculator.validate(inputs);
+    case 'gold':
+      return goldCalculator.validate(inputs);
     default:
       return {};
   }
@@ -80,6 +85,8 @@ export function getDefaultInputs(instrumentType: InstrumentType, balance: number
   switch (instrumentType) {
     case 'forex':
       return forexCalculator.getDefaults(balance);
+    case 'gold':
+      return goldCalculator.getDefaults(balance);
     default:
       return forexCalculator.getDefaults(balance);
   }

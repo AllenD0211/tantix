@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import type { UserSession } from '../types/auth';
-import type { ForexInputs, InstrumentType } from '../types/calculator';
+import type { InstrumentType } from '../types/calculator';
 import { DashboardHeader } from '../components/layout/DashboardHeader';
 import { TickerBar } from '../components/layout/TickerBar';
 import { InstrumentSelector } from '../components/calculator/InstrumentSelector';
@@ -8,8 +8,8 @@ import { TradeAnalysisChart } from '../components/charts/TradeAnalysisChart';
 import { CalculatorForm } from '../components/calculator/CalculatorForm';
 import { ResultSummary } from '../components/calculator/ResultSummary';
 import { InstrumentInfo } from '../components/calculator/InstrumentInfo';
-import { forexCalculator } from '../services/calculator/forexCalculator';
-import { validateForexInputs } from '../utils/validation';
+import { calculateTrade, getDefaultInputs, validateInputs } from '../services/calculator/calculatorEngine';
+import type { ActiveCalculatorInputs } from '../utils/instrumentDisplay';
 
 export interface DashboardProps {
   session: UserSession;
@@ -25,26 +25,28 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onToggleTheme,
 }) => {
   const [selectedInstrument, setSelectedInstrument] = useState<InstrumentType>('forex');
+  const sessionBalance = session.balance || 10000;
 
-  // Initialize inputs from session balance
-  const initialInputs = useMemo<ForexInputs>(() => {
-    return forexCalculator.getDefaults(session.balance || 10000);
-  }, [session.balance]);
+  const [inputs, setInputs] = useState<ActiveCalculatorInputs>(() =>
+    getDefaultInputs('forex', sessionBalance) as ActiveCalculatorInputs
+  );
 
-  const [inputs, setInputs] = useState<ForexInputs>(initialInputs);
+  const handleSelectInstrument = (type: InstrumentType) => {
+    if (type !== 'forex' && type !== 'gold') return;
+    setSelectedInstrument(type);
+    setInputs(getDefaultInputs(type, sessionBalance) as ActiveCalculatorInputs);
+  };
 
-  // Real-time input validation
-  const validation = useMemo(() => {
-    return validateForexInputs(inputs);
+  const validationErrors = useMemo(() => {
+    return validateInputs(inputs);
   }, [inputs]);
 
-  // Real-time deterministic calculation
   const calculationResult = useMemo(() => {
-    return forexCalculator.calculate(inputs);
+    return calculateTrade(inputs);
   }, [inputs]);
 
   const handleReset = () => {
-    setInputs(forexCalculator.getDefaults(session.balance || 10000));
+    setInputs(getDefaultInputs(selectedInstrument, sessionBalance) as ActiveCalculatorInputs);
   };
 
   return (
@@ -61,7 +63,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
         <InstrumentSelector
           selected={selectedInstrument}
-          onSelect={setSelectedInstrument}
+          onSelect={handleSelectInstrument}
         />
 
         {/* 2. TOP-SIDE: Trade Analysis Chart & Outcome Overview (As requested) */}
@@ -75,7 +77,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="lg:col-span-7">
             <CalculatorForm
               inputs={inputs}
-              errors={validation.errors}
+              errors={validationErrors}
               onChange={setInputs}
               onReset={handleReset}
             />
