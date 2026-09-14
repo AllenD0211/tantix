@@ -25,21 +25,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-lg font-bold tracking-tight text-[var(--neu-text-primary)]">
-                TANTIX Trade Outcome Calculator
+                Tantix.FX 
               </h1>
-              <span className="text-[10px] font-mono-numbers px-2 py-0.5 rounded-full neu-inset text-[var(--accent-emerald)] flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-emerald)] animate-pulse" />
-                REAL-TIME MATH
-              </span>
-              {session.isDemo && (
-                <span className="text-[10px] font-mono-numbers px-2 py-0.5 rounded-full neu-inset text-[var(--accent-amber)]">
-                  DEMO SIMULATOR
-                </span>
-              )}
             </div>
-            <p className="text-xs text-[var(--neu-text-secondary)] font-mono-numbers mt-0.5">
-              Model margin, profit/loss, and risk/reward before entering real market positions.
-            </p>
           </div>
         </div>
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { LoginHeader } from '../components/layout/LoginHeader';
 import { NeumorphicLogin } from '../components/auth/NeumorphicLogin';
 import type { UserSession } from '../types/auth';
 
@@ -16,7 +15,6 @@ export const Login: React.FC<LoginProps> = ({
 }) => {
   return (
     <div className="flex-1 flex flex-col justify-between relative">
-      <LoginHeader theme={theme} onToggleTheme={onToggleTheme} />
 
       <div className="flex-1 flex items-center justify-center p-4 sm:p-6 relative">
         {/* Subtle Decorative Elements */}

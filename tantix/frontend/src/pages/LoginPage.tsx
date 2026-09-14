@@ -1,5 +1,4 @@
 import React from 'react';
-import { LoginHeader } from '../components/layout/LoginHeader';
 import { NeumorphicLogin } from '../components/auth/NeumorphicLogin';
 import type { UserSession } from '../types/auth';
 
@@ -17,7 +16,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   return (
     <div className="flex-1 flex flex-col justify-between relative">
       {/* Sleek Top Header for Login (NO currency ticker here, as requested) */}
-      <LoginHeader theme={theme} onToggleTheme={onToggleTheme} />
 
       {/* Main Login View Container */}
       <div className="flex-1 flex items-center justify-center p-4 sm:p-6 relative">
