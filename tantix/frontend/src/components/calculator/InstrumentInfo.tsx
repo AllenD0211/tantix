@@ -1,15 +1,43 @@
 import React, { useState } from 'react';
 import { HelpCircle, ChevronDown, ChevronUp, BookOpen, Info } from 'lucide-react';
-import type { ForexInputs } from '../../types/calculator';
+import type { ActiveCalculatorInputs } from '../../utils/instrumentDisplay';
 import { findPairInfo } from '../../services/calculator/forexCalculator';
+import { findMetalInfo } from '../../services/calculator/goldCalculator';
 
 interface InstrumentInfoProps {
-  inputs: ForexInputs;
+  inputs: ActiveCalculatorInputs;
 }
 
 export const InstrumentInfo: React.FC<InstrumentInfoProps> = ({ inputs }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const pairInfo = findPairInfo(inputs.pair);
+  
+  const isForex = inputs.instrumentType === 'forex';
+  const displaySymbol = isForex ? inputs.pair : inputs.symbol;
+  
+  let base = '';
+  let quote = '';
+  let pipSize = 0;
+  let digits = 0;
+  let unitsPerLot = 0;
+  let unitLabel = '';
+
+  if (isForex) {
+    const info = findPairInfo(inputs.pair);
+    base = info.base;
+    quote = info.quote;
+    pipSize = info.pipSize;
+    digits = info.digits;
+    unitsPerLot = 100000;
+    unitLabel = base;
+  } else {
+    const info = findMetalInfo(inputs.symbol);
+    base = info.metal;
+    quote = info.quote;
+    pipSize = info.pipSize;
+    digits = info.digits;
+    unitsPerLot = info.ouncesPerLot;
+    unitLabel = 'oz';
+  }
 
   return (
     <div className="neu-raised-card p-5 sm:p-6 space-y-4 border border-[var(--neu-border-subtle)]">
@@ -26,7 +54,7 @@ export const InstrumentInfo: React.FC<InstrumentInfoProps> = ({ inputs }) => {
               Instrument Specification & Mathematical Formulas
             </h4>
             <p className="text-[11px] text-[var(--neu-text-muted)]">
-              Understand the contract rules, pip valuations, and margin formulas for {inputs.pair}.
+              Understand the contract rules, pip valuations, and margin formulas for {displaySymbol}.
             </p>
           </div>
         </div>
@@ -47,21 +75,21 @@ export const InstrumentInfo: React.FC<InstrumentInfoProps> = ({ inputs }) => {
             <div className="neu-inset p-3 rounded-xl font-mono-numbers">
               <div className="text-[10px] text-[var(--neu-text-muted)] uppercase">Base / Quote</div>
               <div className="text-xs font-bold text-[var(--neu-text-primary)] mt-0.5">
-                {pairInfo.base} / {pairInfo.quote}
+                {base} / {quote}
               </div>
             </div>
 
             <div className="neu-inset p-3 rounded-xl font-mono-numbers">
               <div className="text-[10px] text-[var(--neu-text-muted)] uppercase">Standard Lot</div>
               <div className="text-xs font-bold text-[var(--neu-text-primary)] mt-0.5">
-                100,000 {pairInfo.base}
+                {unitsPerLot.toLocaleString()} {unitLabel}
               </div>
             </div>
 
             <div className="neu-inset p-3 rounded-xl font-mono-numbers">
               <div className="text-[10px] text-[var(--neu-text-muted)] uppercase">1 Pip Size</div>
               <div className="text-xs font-bold text-[var(--neu-text-primary)] mt-0.5">
-                {pairInfo.pipSize} ({pairInfo.digits} decimals)
+                {pipSize} ({digits} decimals)
               </div>
             </div>
 
@@ -87,7 +115,7 @@ export const InstrumentInfo: React.FC<InstrumentInfoProps> = ({ inputs }) => {
                   (Position Units × Base Price in USD) ÷ Leverage
                 </span>
                 <div className="text-[10px] text-[var(--neu-text-muted)] pl-4">
-                  = ({inputs.lotSize} × 100,000 × {inputs.entryPrice}) ÷ {inputs.leverage}
+                  = ({inputs.lotSize} × {unitsPerLot.toLocaleString()} × {inputs.entryPrice}) ÷ {inputs.leverage}
                 </div>
               </li>
 
@@ -97,7 +125,7 @@ export const InstrumentInfo: React.FC<InstrumentInfoProps> = ({ inputs }) => {
                   Position Units × Pip Size (0.0001 or 0.01 for JPY)
                 </span>
                 <div className="text-[10px] text-[var(--neu-text-muted)] pl-4">
-                  = ({inputs.lotSize} × 100,000) × {pairInfo.pipSize}
+                  = ({inputs.lotSize} × {unitsPerLot.toLocaleString()}) × {pipSize}
                 </div>
               </li>
 
