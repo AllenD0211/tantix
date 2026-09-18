@@ -8,7 +8,6 @@ import {
   Layers,
   ArrowUpRight,
   ArrowDownRight,
-  Activity,
   SlidersHorizontal,
 } from 'lucide-react';
 import { TickerBar } from '../components/layout/TickerBar';
@@ -40,8 +39,8 @@ const INITIAL_WATCHLIST: QuickPair[] = [
 export const DashboardPage: React.FC<DashboardPageProps> = ({
   session,
   onSignOut,
-  theme,
-  onToggleTheme,
+  theme: _theme,
+  onToggleTheme: _onToggleTheme,
 }) => {
   const [orderNotification, setOrderNotification] = useState<string | null>(null);
 
@@ -85,11 +84,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
 
           <div className="flex items-center gap-2.5">
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl neu-inset text-xs font-mono-numbers text-[var(--neu-text-secondary)]">
-              <Activity className="w-3.5 h-3.5 text-[var(--accent-cyan)]" />
-              <span>Latency: 1.2ms</span>
-            </div>
-
             <button
               type="button"
               onClick={onSignOut}

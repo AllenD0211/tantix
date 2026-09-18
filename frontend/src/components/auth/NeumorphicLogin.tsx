@@ -9,17 +9,18 @@
     Zap,
     CheckCircle2,
     AlertCircle,
-    Server,
-    ShieldCheck,
   } from 'lucide-react';
   import type { UserSession } from '../../types/auth';
   import { evaluatePasswordStrength } from '../../utils/passwordPolicy';
+  import logoLight from '../../assets/1.png';
+  import logoDark from '../../assets/2.png';
 
   interface NeumorphicLoginProps {
     onSuccessLogin?: (userData: UserSession) => void;
+    theme?: 'dark' | 'light';
   }
 
-  export const NeumorphicLogin: React.FC<NeumorphicLoginProps> = ({ onSuccessLogin }) => {
+  export const NeumorphicLogin: React.FC<NeumorphicLoginProps> = ({ onSuccessLogin, theme = 'dark' }) => {
     const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -107,15 +108,11 @@
 
           {/* Brand Crest & Title */}
           <div className="flex flex-col items-center text-center mb-6 relative z-10">
-            <div className="w-12 h-12 rounded-2xl neu-convex flex items-center justify-center text-[var(--accent-cyan)] mb-3 shadow-sm transition-transform hover:scale-105 duration-200">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <h1 className="text-xl font-black tracking-tight text-[var(--neu-text-primary)]">
-                Tantix<span className="text-[var(--accent-cyan)]">.FX</span>
-              </h1>
-            </div>
+            <img
+              src={theme === 'dark' ? logoDark : logoLight}
+              alt="Tantix.FX Logo"
+              className="h-10 sm:h-12 w-auto object-contain mb-2 transition-transform hover:scale-105 duration-200"
+            />
             <p className="text-xs text-[var(--neu-text-muted)] mt-1">
               Calculate. Analyze. Decide.
             </p>

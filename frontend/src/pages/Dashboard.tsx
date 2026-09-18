@@ -32,7 +32,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
   );
 
   const handleSelectInstrument = (type: InstrumentType) => {
-    if (type !== 'forex' && type !== 'gold') return;
     setSelectedInstrument(type);
     setInputs(getDefaultInputs(type, sessionBalance) as ActiveCalculatorInputs);
   };
@@ -66,31 +65,34 @@ export const Dashboard: React.FC<DashboardProps> = ({
           onSelect={handleSelectInstrument}
         />
 
-        {/* 2. TOP-SIDE: Trade Analysis Chart & Outcome Overview (As requested) */}
-        <section aria-label="Trade Outcome Analysis">
-          <TradeAnalysisChart result={calculationResult} inputs={inputs} />
-        </section>
+        {/* Animated Wrapper for Instrument Content */}
+        <div key={selectedInstrument} className="space-y-6 animate-fadeIn">
+          {/* 2. TOP-SIDE: Trade Analysis Chart & Outcome Overview (As requested) */}
+          <section aria-label="Trade Outcome Analysis">
+            <TradeAnalysisChart result={calculationResult} inputs={inputs} />
+          </section>
 
-        {/* 3. Calculator Form & Detailed Summary Side-by-Side or Stacked */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left / Primary: Calculator Form (7 cols on lg) */}
-          <div className="lg:col-span-7">
-            <CalculatorForm
-              inputs={inputs}
-              errors={validationErrors}
-              onChange={setInputs}
-              onReset={handleReset}
-            />
+          {/* 3. Calculator Form & Detailed Summary Side-by-Side or Stacked */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left / Primary: Calculator Form (7 cols on lg) */}
+            <div className="lg:col-span-7">
+              <CalculatorForm
+                inputs={inputs}
+                errors={validationErrors}
+                onChange={setInputs}
+                onReset={handleReset}
+              />
+            </div>
+
+            {/* Right: Detailed Result Summary (5 cols on lg) */}
+            <div className="lg:col-span-5 space-y-6">
+              <ResultSummary result={calculationResult} inputs={inputs} />
+            </div>
           </div>
 
-          {/* Right: Detailed Result Summary (5 cols on lg) */}
-          <div className="lg:col-span-5 space-y-6">
-            <ResultSummary result={calculationResult} inputs={inputs} />
-          </div>
+          {/* 4. Educational Guide & Formula Documentation */}
+          <InstrumentInfo inputs={inputs} />
         </div>
-
-        {/* 4. Educational Guide & Formula Documentation */}
-        <InstrumentInfo inputs={inputs} />
       </div>
     </div>
   );

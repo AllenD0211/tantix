@@ -6,6 +6,9 @@ import type {
 } from '../../types/calculator';
 import { forexCalculator } from './forexCalculator';
 import { goldCalculator } from './goldCalculator';
+import { stockCalculator } from './stockCalculator';
+import { cryptoCalculator } from './cryptoCalculator';
+import { indexCalculator } from './indexCalculator';
 
 export const SUPPORTED_INSTRUMENTS: InstrumentSpec[] = [
   {
@@ -30,7 +33,7 @@ export const SUPPORTED_INSTRUMENTS: InstrumentSpec[] = [
     description: 'US & Global Equity Shares',
     standardLotUnit: '1 Share',
     standardLotSize: 1,
-    supported: false, // Phase 2
+    supported: true,
   },
   {
     id: 'crypto',
@@ -38,7 +41,7 @@ export const SUPPORTED_INSTRUMENTS: InstrumentSpec[] = [
     description: 'BTC, ETH & Major Perpetual Contracts',
     standardLotUnit: '1 Coin Unit',
     standardLotSize: 1,
-    supported: false, // Phase 2
+    supported: true,
   },
   {
     id: 'indices',
@@ -46,7 +49,7 @@ export const SUPPORTED_INSTRUMENTS: InstrumentSpec[] = [
     description: 'US30, NAS100, SPX500, GER40',
     standardLotUnit: '1 Point Index Multiplier',
     standardLotSize: 1,
-    supported: false, // Phase 2
+    supported: true,
   },
 ];
 
@@ -59,8 +62,14 @@ export function calculateTrade(inputs: CalculatorInputs): CalculationResult {
       return forexCalculator.calculate(inputs);
     case 'gold':
       return goldCalculator.calculate(inputs);
+    case 'stocks':
+      return stockCalculator.calculate(inputs);
+    case 'crypto':
+      return cryptoCalculator.calculate(inputs);
+    case 'indices':
+      return indexCalculator.calculate(inputs);
     default:
-      throw new Error(`Calculation engine for instrument '${inputs.instrumentType}' is not yet activated.`);
+      throw new Error(`Calculation engine for instrument '${(inputs as any).instrumentType}' is not yet activated.`);
   }
 }
 
@@ -73,6 +82,12 @@ export function validateInputs(inputs: CalculatorInputs): Record<string, string>
       return forexCalculator.validate(inputs);
     case 'gold':
       return goldCalculator.validate(inputs);
+    case 'stocks':
+      return stockCalculator.validate(inputs);
+    case 'crypto':
+      return cryptoCalculator.validate(inputs);
+    case 'indices':
+      return indexCalculator.validate(inputs);
     default:
       return {};
   }
@@ -87,7 +102,16 @@ export function getDefaultInputs(instrumentType: InstrumentType, balance: number
       return forexCalculator.getDefaults(balance);
     case 'gold':
       return goldCalculator.getDefaults(balance);
+    case 'stocks':
+      return stockCalculator.getDefaults(balance);
+    case 'crypto':
+      return cryptoCalculator.getDefaults(balance);
+    case 'indices':
+      return indexCalculator.getDefaults(balance);
     default:
       return forexCalculator.getDefaults(balance);
   }
 }
+
+
+

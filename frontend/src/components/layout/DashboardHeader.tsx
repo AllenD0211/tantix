@@ -1,6 +1,8 @@
 import React from 'react';
-import { Calculator, LogOut, Sun, Moon } from 'lucide-react';
+import { LogOut, Sun, Moon } from 'lucide-react';
 import type { UserSession } from '../../types/auth';
+import logoLight from '../../assets/1.png';
+import logoDark from '../../assets/2.png';
 
 interface DashboardHeaderProps {
   session: UserSession;
@@ -19,14 +21,16 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     <header className="w-full border-b border-[var(--neu-border-subtle)] bg-[var(--neu-bg)]/90 backdrop-blur-md px-4 sm:px-6 py-3 transition-colors duration-200">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3.5 min-w-0">
-          <div className="w-11 h-11 rounded-xl neu-convex flex items-center justify-center text-[var(--accent-cyan)] shrink-0 shadow-[0_0_15px_var(--accent-cyan-glow)]">
-            <Calculator className="w-5 h-5" />
-          </div>
+          <img
+            src={theme === 'dark' ? logoDark : logoLight}
+            alt="Tantix.FX Logo"
+            className="h-7 sm:h-8 w-auto object-contain shrink-0"
+          />
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-lg font-bold tracking-tight text-[var(--neu-text-primary)]">
-                Tantix.FX 
-              </h1>
+              <span className="text-[10px] font-mono-numbers px-2 py-0.5 rounded-full neu-inset text-[var(--accent-cyan)]">
+                {session.email}
+              </span>
             </div>
           </div>
         </div>

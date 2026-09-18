@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { HelpCircle, ChevronDown, ChevronUp, BookOpen, Info } from 'lucide-react';
+import { ChevronDown, ChevronUp, BookOpen, Info } from 'lucide-react';
 import type { ActiveCalculatorInputs } from '../../utils/instrumentDisplay';
 import { findPairInfo } from '../../services/calculator/forexCalculator';
 import { findMetalInfo } from '../../services/calculator/goldCalculator';
+import { findStockInfo } from '../../services/calculator/stockCalculator';
+import { findCryptoInfo } from '../../services/calculator/cryptoCalculator';
 
 interface InstrumentInfoProps {
   inputs: ActiveCalculatorInputs;
@@ -12,7 +14,9 @@ export const InstrumentInfo: React.FC<InstrumentInfoProps> = ({ inputs }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   
   const isForex = inputs.instrumentType === 'forex';
-  const displaySymbol = isForex ? inputs.pair : inputs.symbol;
+  const isStocks = inputs.instrumentType === 'stocks';
+  const isCrypto = inputs.instrumentType === 'crypto';
+  const displaySymbol = isForex || isCrypto ? inputs.pair : inputs.symbol;
   
   let base = '';
   let quote = '';
@@ -29,6 +33,22 @@ export const InstrumentInfo: React.FC<InstrumentInfoProps> = ({ inputs }) => {
     digits = info.digits;
     unitsPerLot = 100000;
     unitLabel = base;
+  } else if (isStocks) {
+    const info = findStockInfo(inputs.symbol);
+    base = info.symbol;
+    quote = info.currency;
+    pipSize = 0.01;
+    digits = 2;
+    unitsPerLot = 1;
+    unitLabel = 'share';
+  } else if (isCrypto) {
+    const info = findCryptoInfo(inputs.pair);
+    base = info.baseCoin;
+    quote = 'USD';
+    pipSize = Math.pow(10, -info.digits);
+    digits = info.digits;
+    unitsPerLot = 1;
+    unitLabel = 'coin';
   } else {
     const info = findMetalInfo(inputs.symbol);
     base = info.metal;
@@ -38,6 +58,13 @@ export const InstrumentInfo: React.FC<InstrumentInfoProps> = ({ inputs }) => {
     unitsPerLot = info.ouncesPerLot;
     unitLabel = 'oz';
   }
+
+  const quantityStr = isStocks
+    ? `${(inputs as any).shares} shares`
+    : isCrypto
+    ? `${(inputs as any).coinAmount} ${base} coins`
+    : `${(inputs as any).lotSize} lots (${((inputs as any).lotSize * unitsPerLot).toLocaleString()} ${unitLabel})`;
+
 
   return (
     <div className="neu-raised-card p-5 sm:p-6 space-y-4 border border-[var(--neu-border-subtle)]">
@@ -80,14 +107,18 @@ export const InstrumentInfo: React.FC<InstrumentInfoProps> = ({ inputs }) => {
             </div>
 
             <div className="neu-inset p-3 rounded-xl font-mono-numbers">
-              <div className="text-[10px] text-[var(--neu-text-muted)] uppercase">Standard Lot</div>
+              <div className="text-[10px] text-[var(--neu-text-muted)] uppercase">
+                {isStocks ? 'Unit Size' : 'Standard Lot'}
+              </div>
               <div className="text-xs font-bold text-[var(--neu-text-primary)] mt-0.5">
                 {unitsPerLot.toLocaleString()} {unitLabel}
               </div>
             </div>
 
             <div className="neu-inset p-3 rounded-xl font-mono-numbers">
-              <div className="text-[10px] text-[var(--neu-text-muted)] uppercase">1 Pip Size</div>
+              <div className="text-[10px] text-[var(--neu-text-muted)] uppercase">
+                {isStocks ? 'Price Scale' : '1 Pip Size'}
+              </div>
               <div className="text-xs font-bold text-[var(--neu-text-primary)] mt-0.5">
                 {pipSize} ({digits} decimals)
               </div>
@@ -115,17 +146,19 @@ export const InstrumentInfo: React.FC<InstrumentInfoProps> = ({ inputs }) => {
                   (Position Units × Base Price in USD) ÷ Leverage
                 </span>
                 <div className="text-[10px] text-[var(--neu-text-muted)] pl-4">
-                  = ({inputs.lotSize} × {unitsPerLot.toLocaleString()} × {inputs.entryPrice}) ÷ {inputs.leverage}
+                  = ({quantityStr} × {inputs.entryPrice}) ÷ {inputs.leverage}
                 </div>
               </li>
 
               <li>
-                <strong className="text-[var(--neu-text-primary)] font-sans">1 Pip Value ($):</strong>{' '}
+                <strong className="text-[var(--neu-text-primary)] font-sans">
+                  {isStocks ? '$0.01 Share Value ($):' : '1 Pip Value ($):'}
+                </strong>{' '}
                 <span className="text-[var(--accent-cyan)]">
-                  Position Units × Pip Size (0.0001 or 0.01 for JPY)
+                  {isStocks ? 'Shares × $0.01' : 'Position Units × Pip Size (0.0001 or 0.01 for JPY)'}
                 </span>
                 <div className="text-[10px] text-[var(--neu-text-muted)] pl-4">
-                  = ({inputs.lotSize} × {unitsPerLot.toLocaleString()}) × {pipSize}
+                  = ({quantityStr}) × {pipSize}
                 </div>
               </li>
 

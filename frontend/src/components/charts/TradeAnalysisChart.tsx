@@ -7,7 +7,6 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Target,
-  Percent,
 } from 'lucide-react';
 import type { CalculationResult } from '../../types/calculator';
 import { formatCurrency, formatPips, formatRatio } from '../../utils/formatting';
@@ -82,7 +81,15 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
               </span>
             </div>
             <p className="text-xs text-[var(--neu-text-muted)] font-mono-numbers mt-0.5">
-              Position: {inputs.lotSize} Lots ({result.positionSizeUnits.toLocaleString()} {unitLabel}) • Leverage 1:{inputs.leverage}
+              Position:{' '}
+              {inputs.instrumentType === 'stocks'
+                ? `${result.positionSizeUnits.toLocaleString()} Shares`
+                : inputs.instrumentType === 'crypto'
+                ? `${result.positionSizeUnits} ${inputs.pair.split('/')[0]} Coins`
+                : inputs.instrumentType === 'indices'
+                ? `${result.positionSizeUnits.toLocaleString()} Contracts`
+                : `${(inputs as any).lotSize} Lots (${result.positionSizeUnits.toLocaleString()} ${unitLabel})`}{' '}
+              • Leverage 1:{inputs.leverage}
             </p>
           </div>
         </div>
@@ -119,7 +126,17 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
           </div>
           <div className="text-[11px] text-[var(--accent-emerald)] font-mono-numbers mt-0.5 flex items-center gap-1">
             {rewardPercent !== null && <span>+{rewardPercent.toFixed(2)}% of account</span>}
-            {takeProfitDistancePips !== null && <span>({takeProfitDistancePips.toFixed(1)} pips)</span>}
+            {takeProfitDistancePips !== null && (
+              <span>
+                (
+                {inputs.instrumentType === 'crypto' || inputs.instrumentType === 'stocks'
+                  ? `$${takeProfitDistancePips.toLocaleString()}`
+                  : inputs.instrumentType === 'indices'
+                  ? `${takeProfitDistancePips.toFixed(1)} pts`
+                  : formatPips(takeProfitDistancePips)}
+                )
+              </span>
+            )}
           </div>
         </div>
 
@@ -134,7 +151,17 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
           </div>
           <div className="text-[11px] text-[var(--accent-rose)] font-mono-numbers mt-0.5 flex items-center gap-1">
             {riskPercent !== null && <span>-{riskPercent.toFixed(2)}% risk</span>}
-            {stopLossDistancePips !== null && <span>({stopLossDistancePips.toFixed(1)} pips)</span>}
+            {stopLossDistancePips !== null && (
+              <span>
+                (
+                {inputs.instrumentType === 'crypto' || inputs.instrumentType === 'stocks'
+                  ? `$${stopLossDistancePips.toLocaleString()}`
+                  : inputs.instrumentType === 'indices'
+                  ? `${stopLossDistancePips.toFixed(1)} pts`
+                  : formatPips(stopLossDistancePips)}
+                )
+              </span>
+            )}
           </div>
         </div>
 
@@ -162,7 +189,14 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
             {formatCurrency(positionValue, inputs.accountCurrency)}
           </div>
           <div className="text-[11px] text-[var(--neu-text-muted)] font-mono-numbers mt-0.5">
-            1 Pip = {formatCurrency(pipValue, inputs.accountCurrency)}
+            {inputs.instrumentType === 'crypto'
+              ? '$1.00 Move'
+              : inputs.instrumentType === 'stocks'
+              ? '$0.01 Move'
+              : inputs.instrumentType === 'indices'
+              ? '1 Point Move'
+              : '1 Pip'}{' '}
+            = {formatCurrency(pipValue, inputs.accountCurrency)}
           </div>
         </div>
       </div>
@@ -202,7 +236,7 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
         <div className="flex items-center justify-between text-xs text-[var(--neu-text-muted)]">
           <span className="font-semibold uppercase tracking-wider text-[10px]">Price Ladder Map</span>
           <span className="font-mono-numbers text-[11px]">
-            Pip Scale ({priceDecimals} decimals)
+            {inputs.instrumentType === 'stocks' ? 'Share Price ($)' : 'Pip Scale'} ({priceDecimals} decimals)
           </span>
         </div>
 
@@ -221,7 +255,7 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
               </div>
               {takeProfitDistancePips !== null && (
                 <div className="text-[10px] text-[var(--accent-emerald)]">
-                  +{formatPips(takeProfitDistancePips)} • +{formatCurrency(potentialProfit, inputs.accountCurrency)}
+                  +{inputs.instrumentType === 'stocks' ? `$${takeProfitDistancePips.toFixed(2)}` : formatPips(takeProfitDistancePips)} • +{formatCurrency(potentialProfit, inputs.accountCurrency)}
                 </div>
               )}
             </div>
@@ -259,13 +293,14 @@ export const TradeAnalysisChart: React.FC<TradeAnalysisChartProps> = ({ result, 
               </div>
               {stopLossDistancePips !== null && (
                 <div className="text-[10px] text-[var(--accent-rose)]">
-                  -{formatPips(stopLossDistancePips)} • -{formatCurrency(potentialLoss, inputs.accountCurrency)}
+                  -{inputs.instrumentType === 'stocks' ? `$${stopLossDistancePips.toFixed(2)}` : formatPips(stopLossDistancePips)} • -{formatCurrency(potentialLoss, inputs.accountCurrency)}
                 </div>
               )}
             </div>
           </div>
         </div>
       </div>
+
 
       {/* Warnings / Context Notice */}
       {result.warnings && result.warnings.length > 0 && (

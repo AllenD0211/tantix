@@ -2,6 +2,8 @@ import React from 'react';
 import { NeumorphicLogin } from '../components/auth/NeumorphicLogin';
 import type { UserSession } from '../types/auth';
 
+import { Sun, Moon } from 'lucide-react';
+
 export interface LoginProps {
   onLoginSuccess: (session: UserSession) => void;
   theme: 'dark' | 'light';
@@ -15,6 +17,17 @@ export const Login: React.FC<LoginProps> = ({
 }) => {
   return (
     <div className="flex-1 flex flex-col justify-between relative min-h-[calc(100vh-80px)]">
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50">
+        <button
+          onClick={onToggleTheme}
+          className="w-10 h-10 rounded-xl neu-convex flex items-center justify-center text-[var(--neu-text-secondary)] hover:text-[var(--accent-cyan)] transition-colors cursor-pointer"
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        </button>
+      </div>
+
       {/* Main Login View Container */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 relative max-w-7xl mx-auto w-full">
         {/* 2-Column Split Layout */}
@@ -40,7 +53,7 @@ export const Login: React.FC<LoginProps> = ({
 
           {/* Right Side - Neumorphic Login Form */}
           <div className="lg:col-span-6 flex justify-center lg:justify-end w-full">
-            <NeumorphicLogin onSuccessLogin={onLoginSuccess} />
+            <NeumorphicLogin theme={theme} onSuccessLogin={onLoginSuccess} />
           </div>
         </div>
       </div>

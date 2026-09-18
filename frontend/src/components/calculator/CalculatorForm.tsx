@@ -8,6 +8,9 @@ import {
 import type { TradeDirection } from '../../types/calculator';
 import { POPULAR_FOREX_PAIRS, findPairInfo } from '../../services/calculator/forexCalculator';
 import { METAL_INSTRUMENTS, findMetalInfo } from '../../services/calculator/goldCalculator';
+import { POPULAR_STOCKS, findStockInfo } from '../../services/calculator/stockCalculator';
+import { POPULAR_CRYPTO_PAIRS, findCryptoInfo } from '../../services/calculator/cryptoCalculator';
+import { POPULAR_EQUITY_INDICES, findPointIndexInfo } from '../../services/calculator/indexCalculator';
 import type { ActiveCalculatorInputs } from '../../utils/instrumentDisplay';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
@@ -26,13 +29,55 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   onReset,
 }) => {
   const isGold = inputs.instrumentType === 'gold';
+  const isStocks = inputs.instrumentType === 'stocks';
+  const isCrypto = inputs.instrumentType === 'crypto';
+  const isIndices = inputs.instrumentType === 'indices';
+  const isForex = inputs.instrumentType === 'forex';
+
   const metalInfo = isGold ? findMetalInfo(inputs.symbol) : null;
-  const pairInfo = !isGold ? findPairInfo(inputs.pair) : null;
-  const pipSize = isGold ? metalInfo!.pipSize : pairInfo!.pipSize;
-  const digits = isGold ? metalInfo!.digits : pairInfo!.digits;
-  const defaultPrice = isGold ? metalInfo!.defaultPrice : pairInfo!.defaultPrice;
+  const stockInfo = isStocks ? findStockInfo(inputs.symbol) : null;
+  const cryptoInfo = isCrypto ? findCryptoInfo(inputs.pair) : null;
+  const indexInfo = isIndices ? findPointIndexInfo(inputs.symbol) : null;
+  const pairInfo = isForex ? findPairInfo(inputs.pair) : null;
+
+  const pipSize = isGold
+    ? metalInfo!.pipSize
+    : isStocks
+    ? 0.01
+    : isCrypto
+    ? Math.pow(10, -cryptoInfo!.digits)
+    : isIndices
+    ? Math.pow(10, -indexInfo!.digits)
+    : pairInfo!.pipSize;
+
+  const digits = isGold
+    ? metalInfo!.digits
+    : isStocks
+    ? 2
+    : isCrypto
+    ? cryptoInfo!.digits
+    : isIndices
+    ? indexInfo!.digits
+    : pairInfo!.digits;
+
+  const defaultPrice = isGold
+    ? metalInfo!.defaultPrice
+    : isStocks
+    ? stockInfo!.defaultPrice
+    : isCrypto
+    ? cryptoInfo!.defaultPrice
+    : isIndices
+    ? indexInfo!.defaultPrice
+    : pairInfo!.defaultPrice;
+
   const lotUnitLabel = isGold
     ? `1 Lot = ${metalInfo!.ouncesPerLot.toLocaleString()} troy oz`
+    : isStocks
+    ? '1 Share = 1 Equity Unit'
+    : isCrypto
+    ? `1 Unit = 1 ${cryptoInfo?.baseCoin || 'Coin'} Contract`
+    : isIndices
+    ? '1 Contract = $1 Per Point Multiplier'
     : '1 Lot = 100,000 units';
 
   const applyInstrumentChange = (next: ActiveCalculatorInputs) => onChange(next);
@@ -79,12 +124,91 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     });
   };
 
+  const handleStockChange = (symbol: string) => {
+    if (inputs.instrumentType !== 'stocks') return;
+    const stock = findStockInfo(symbol);
+    const isBuy = inputs.direction === 'BUY';
+    const entry = stock.defaultPrice;
+    const slDiff = 10;
+    const tpDiff = 25;
+
+    applyInstrumentChange({
+      ...inputs,
+      symbol,
+      entryPrice: entry,
+      stopLossPrice: isBuy
+        ? Number((entry - slDiff).toFixed(2))
+        : Number((entry + slDiff).toFixed(2)),
+      takeProfitPrice: isBuy
+        ? Number((entry + tpDiff).toFixed(2))
+        : Number((entry - tpDiff).toFixed(2)),
+    });
+  };
+
+  const handleCryptoChange = (pair: string) => {
+    if (inputs.instrumentType !== 'crypto') return;
+    const crypto = findCryptoInfo(pair);
+    const isBuy = inputs.direction === 'BUY';
+    const entry = crypto.defaultPrice;
+    const slDiff = entry * 0.05; // 5% default SL
+    const tpDiff = entry * 0.10; // 10% default TP
+
+    applyInstrumentChange({
+      ...inputs,
+      pair,
+      entryPrice: entry,
+      stopLossPrice: isBuy
+        ? Number((entry - slDiff).toFixed(crypto.digits))
+        : Number((entry + slDiff).toFixed(crypto.digits)),
+      takeProfitPrice: isBuy
+        ? Number((entry + tpDiff).toFixed(crypto.digits))
+        : Number((entry - tpDiff).toFixed(crypto.digits)),
+    });
+  };
+
+  const handleIndexChange = (symbol: string) => {
+    if (inputs.instrumentType !== 'indices') return;
+    const index = findPointIndexInfo(symbol);
+    const isBuy = inputs.direction === 'BUY';
+    const entry = index.defaultPrice;
+    const slDiff = symbol === 'SPX500' ? 50 : 200;
+    const tpDiff = symbol === 'SPX500' ? 100 : 400;
+
+    applyInstrumentChange({
+      ...inputs,
+      symbol,
+      entryPrice: entry,
+      stopLossPrice: isBuy
+        ? Number((entry - slDiff).toFixed(index.digits))
+        : Number((entry + slDiff).toFixed(index.digits)),
+      takeProfitPrice: isBuy
+        ? Number((entry + tpDiff).toFixed(index.digits))
+        : Number((entry - tpDiff).toFixed(index.digits)),
+    });
+  };
+
   const handleDirectionChange = (direction: TradeDirection) => {
     if (direction === inputs.direction) return;
 
     const entry = inputs.entryPrice;
-    const currentSlDist = inputs.stopLossPrice ? Math.abs(entry - inputs.stopLossPrice) : pipSize * (isGold ? 100 : 50);
-    const currentTpDist = inputs.takeProfitPrice ? Math.abs(entry - inputs.takeProfitPrice) : pipSize * (isGold ? 200 : 100);
+    const currentSlDist = inputs.stopLossPrice
+      ? Math.abs(entry - inputs.stopLossPrice)
+      : isStocks
+      ? 10
+      : isCrypto
+      ? entry * 0.05
+      : isIndices
+      ? 200
+      : pipSize * (isGold ? 100 : 50);
+    const currentTpDist = inputs.takeProfitPrice
+      ? Math.abs(entry - inputs.takeProfitPrice)
+      : isStocks
+      ? 25
+      : isCrypto
+      ? entry * 0.10
+      : isIndices
+      ? 400
+      : pipSize * (isGold ? 200 : 100);
 
     const newSl = direction === 'BUY' ? entry - currentSlDist : entry + currentSlDist;
     const newTp = direction === 'BUY' ? entry + currentTpDist : entry - currentTpDist;
@@ -97,9 +221,9 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     });
   };
 
-  const applyPipsToStopLoss = (pips: number) => {
+  const applyPipsToStopLoss = (presetVal: number) => {
     const isBuy = inputs.direction === 'BUY';
-    const delta = pips * pipSize;
+    const delta = isStocks || isCrypto || isIndices ? presetVal : presetVal * pipSize;
     const newSl = isBuy ? inputs.entryPrice - delta : inputs.entryPrice + delta;
     applyInstrumentChange({
       ...inputs,
@@ -107,9 +231,9 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     });
   };
 
-  const applyPipsToTakeProfit = (pips: number) => {
+  const applyPipsToTakeProfit = (presetVal: number) => {
     const isBuy = inputs.direction === 'BUY';
-    const delta = pips * pipSize;
+    const delta = isStocks || isCrypto || isIndices ? presetVal : presetVal * pipSize;
     const newTp = isBuy ? inputs.entryPrice + delta : inputs.entryPrice - delta;
     applyInstrumentChange({
       ...inputs,
@@ -117,8 +241,42 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     });
   };
 
-  const slPresets = isGold ? [50, 100, 200, 500] : [20, 30, 50, 100];
-  const tpPresets = isGold ? [100, 200, 500, 1000] : [30, 50, 100, 150];
+  const getSlPresets = () => {
+    if (isGold) return [50, 100, 200, 500];
+    if (isStocks) return [2, 5, 10, 20];
+    if (isCrypto) {
+      const base = inputs.entryPrice || 1000;
+      return [
+        Number((base * 0.02).toFixed(digits > 2 ? digits : 0)),
+        Number((base * 0.05).toFixed(digits > 2 ? digits : 0)),
+        Number((base * 0.10).toFixed(digits > 2 ? digits : 0)),
+      ];
+    }
+    if (isIndices) {
+      return inputs.symbol === 'SPX500' ? [20, 50, 100, 200] : [50, 100, 200, 500];
+    }
+    return [20, 30, 50, 100];
+  };
+
+  const getTpPresets = () => {
+    if (isGold) return [100, 200, 500, 1000];
+    if (isStocks) return [5, 15, 25, 50];
+    if (isCrypto) {
+      const base = inputs.entryPrice || 1000;
+      return [
+        Number((base * 0.05).toFixed(digits > 2 ? digits : 0)),
+        Number((base * 0.10).toFixed(digits > 2 ? digits : 0)),
+        Number((base * 0.20).toFixed(digits > 2 ? digits : 0)),
+      ];
+    }
+    if (isIndices) {
+      return inputs.symbol === 'SPX500' ? [50, 100, 200, 400] : [100, 200, 500, 1000];
+    }
+    return [30, 50, 100, 150];
+  };
+
+  const slPresets = getSlPresets();
+  const tpPresets = getTpPresets();
 
   return (
     <div className="neu-raised-card p-5 sm:p-6 space-y-5 border border-[var(--neu-border-subtle)]">
@@ -130,6 +288,12 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           <p className="text-xs text-[var(--neu-text-muted)] mt-0.5">
             {isGold
               ? 'Model spot gold and silver contracts using troy-ounce lots, margin, and P/L.'
+              : isStocks
+              ? 'Model equity shares, position size, margin requirements, and risk-to-reward.'
+              : isCrypto
+              ? 'Model crypto perpetual futures contracts, coin size, and leverage margins.'
+              : isIndices
+              ? 'Model global equity index contracts (US30, NAS100, SPX500) using point valuation and margin.'
               : 'Enter your trade parameters to compute real-time margins and P/L.'}
           </p>
         </div>
@@ -190,6 +354,42 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             }))}
             error={errors.symbol}
           />
+        ) : isStocks ? (
+          <Select
+            label="Stock Symbol"
+            value={inputs.symbol}
+            onChange={(e) => handleStockChange(e.target.value)}
+            options={POPULAR_STOCKS.map((s) => ({
+              value: s.symbol,
+              label: `${s.symbol} - ${s.name}`,
+              subLabel: `Ref Price: $${s.defaultPrice.toFixed(2)}`,
+            }))}
+            error={errors.symbol}
+          />
+        ) : isCrypto ? (
+          <Select
+            label="Crypto Perpetual Contract"
+            value={inputs.pair}
+            onChange={(e) => handleCryptoChange(e.target.value)}
+            options={POPULAR_CRYPTO_PAIRS.map((c) => ({
+              value: c.pair,
+              label: `${c.pair} (${c.name})`,
+              subLabel: `Ref Price: $${c.defaultPrice.toLocaleString()}`,
+            }))}
+            error={errors.pair}
+          />
+        ) : isIndices ? (
+          <Select
+            label="Equity Index Instrument"
+            value={inputs.symbol}
+            onChange={(e) => handleIndexChange(e.target.value)}
+            options={POPULAR_EQUITY_INDICES.map((i) => ({
+              value: i.symbol,
+              label: `${i.symbol} - ${i.name}`,
+              subLabel: `Ref Index: ${i.defaultPrice.toLocaleString()}`,
+            }))}
+            error={errors.symbol}
+          />
         ) : (
           <Select
             label="Currency Pair"
@@ -224,16 +424,44 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           label="Account Leverage"
           value={inputs.leverage}
           onChange={(e) =>
-            applyInstrumentChange({ ...inputs, leverage: parseInt(e.target.value, 10) || 100 })
+            applyInstrumentChange({ ...inputs, leverage: parseInt(e.target.value, 10) || 1 })
           }
-          options={[
-            { value: 20, label: '1:20 (Metals Retail)' },
-            { value: 30, label: '1:30 (Retail Standard EU/UK)' },
-            { value: 50, label: '1:50 (US Regulated Cap)' },
-            { value: 100, label: '1:100 (Standard ECN)' },
-            { value: 200, label: '1:200 (Professional)' },
-            { value: 500, label: '1:500 (High Leverage)' },
-          ]}
+          options={
+            isStocks
+              ? [
+                  { value: 1, label: '1:1 (No Leverage / Cash)' },
+                  { value: 2, label: '1:2 (Reg T Margin)' },
+                  { value: 5, label: '1:5 (Standard CFD / Equity)' },
+                  { value: 10, label: '1:10 (Day Trading Margin)' },
+                  { value: 20, label: '1:20 (Max Equity CFD)' },
+                ]
+              : isCrypto
+              ? [
+                  { value: 1, label: '1:1 (Spot / 1x)' },
+                  { value: 2, label: '1:2 (2x Low Margin)' },
+                  { value: 5, label: '1:5 (5x Standard)' },
+                  { value: 10, label: '1:10 (10x Leverage)' },
+                  { value: 20, label: '1:20 (20x Perpetual)' },
+                  { value: 50, label: '1:50 (50x High Risk)' },
+                  { value: 100, label: '1:100 (100x Max Degen)' },
+                ]
+              : isIndices
+              ? [
+                  { value: 10, label: '1:10 (Conservative Margin)' },
+                  { value: 20, label: '1:20 (EU/UK Retail Cap)' },
+                  { value: 50, label: '1:50 (Standard Index ECN)' },
+                  { value: 100, label: '1:100 (Standard ECN)' },
+                  { value: 200, label: '1:200 (Professional)' },
+                ]
+              : [
+                  { value: 20, label: '1:20 (Metals Retail)' },
+                  { value: 30, label: '1:30 (Retail Standard EU/UK)' },
+                  { value: 50, label: '1:50 (US Regulated Cap)' },
+                  { value: 100, label: '1:100 (Standard ECN)' },
+                  { value: 200, label: '1:200 (Professional)' },
+                  { value: 500, label: '1:500 (High Leverage)' },
+                ]
+          }
           error={errors.leverage}
         />
       </div>
@@ -241,7 +469,13 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="text-xs font-semibold text-[var(--neu-text-secondary)]">
-            Position Size (Lot Size)
+            {isStocks
+              ? 'Position Size (Share Quantity)'
+              : isCrypto
+              ? 'Position Size (Coin Amount)'
+              : isIndices
+              ? 'Position Size (Contract Quantity)'
+              : 'Position Size (Lot Size)'}
           </label>
           <span className="text-[10px] text-[var(--neu-text-muted)] font-mono-numbers">
             {lotUnitLabel}
@@ -250,35 +484,121 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex-1 min-w-[140px]">
-            <Input
-              type="number"
-              step="0.01"
-              min="0.01"
-              max="100"
-              suffix="Lots"
-              value={inputs.lotSize || ''}
-              onChange={(e) =>
-                applyInstrumentChange({ ...inputs, lotSize: parseFloat(e.target.value) || 0 })
-              }
-              error={errors.lotSize}
-            />
+            {isStocks ? (
+              <Input
+                type="number"
+                step="1"
+                min="1"
+                max="100000"
+                suffix="Shares"
+                value={(inputs as any).shares || ''}
+                onChange={(e) =>
+                  applyInstrumentChange({ ...inputs, shares: parseInt(e.target.value, 10) || 0 } as any)
+                }
+                error={errors.shares}
+              />
+            ) : isCrypto ? (
+              <Input
+                type="number"
+                step="0.01"
+                min="0.001"
+                max="10000"
+                suffix={cryptoInfo?.baseCoin || 'Coins'}
+                value={(inputs as any).coinAmount || ''}
+                onChange={(e) =>
+                  applyInstrumentChange({ ...inputs, coinAmount: parseFloat(e.target.value) || 0 } as any)
+                }
+                error={(errors as any).coinAmount}
+              />
+            ) : isIndices ? (
+              <Input
+                type="number"
+                step="0.01"
+                min="0.01"
+                max="1000"
+                suffix="Contracts"
+                value={(inputs as any).contracts || ''}
+                onChange={(e) =>
+                  applyInstrumentChange({ ...inputs, contracts: parseFloat(e.target.value) || 0 } as any)
+                }
+                error={(errors as any).contracts}
+              />
+            ) : (
+              <Input
+                type="number"
+                step="0.01"
+                min="0.01"
+                max="100"
+                suffix="Lots"
+                value={(inputs as any).lotSize || ''}
+                onChange={(e) =>
+                  applyInstrumentChange({ ...inputs, lotSize: parseFloat(e.target.value) || 0 } as any)
+                }
+                error={errors.lotSize}
+              />
+            )}
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
-            {[0.01, 0.1, 0.5, 1.0, 2.0].map((preset) => (
-              <button
-                key={preset}
-                type="button"
-                onClick={() => applyInstrumentChange({ ...inputs, lotSize: preset })}
-                className={`neu-btn px-2.5 py-2 rounded-lg text-xs font-mono-numbers cursor-pointer transition-colors ${
-                  inputs.lotSize === preset
-                    ? 'text-[var(--accent-cyan)] border border-[var(--accent-cyan)]/40 font-bold'
-                    : 'text-[var(--neu-text-secondary)] hover:text-[var(--neu-text-primary)]'
-                }`}
-              >
-                {preset.toFixed(2)}
-              </button>
-            ))}
+            {isStocks
+              ? [10, 50, 100, 500, 1000].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => applyInstrumentChange({ ...inputs, shares: preset } as any)}
+                    className={`neu-btn px-2.5 py-2 rounded-lg text-xs font-mono-numbers cursor-pointer transition-colors ${
+                      (inputs as any).shares === preset
+                        ? 'text-[var(--accent-cyan)] border border-[var(--accent-cyan)]/40 font-bold'
+                        : 'text-[var(--neu-text-secondary)] hover:text-[var(--neu-text-primary)]'
+                    }`}
+                  >
+                    {preset}
+                  </button>
+                ))
+              : isCrypto
+              ? [0.05, 0.1, 0.5, 1.0, 5.0].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => applyInstrumentChange({ ...inputs, coinAmount: preset } as any)}
+                    className={`neu-btn px-2.5 py-2 rounded-lg text-xs font-mono-numbers cursor-pointer transition-colors ${
+                      (inputs as any).coinAmount === preset
+                        ? 'text-[var(--accent-cyan)] border border-[var(--accent-cyan)]/40 font-bold'
+                        : 'text-[var(--neu-text-secondary)] hover:text-[var(--neu-text-primary)]'
+                    }`}
+                  >
+                    {preset} {cryptoInfo?.baseCoin || ''}
+                  </button>
+                ))
+              : isIndices
+              ? [0.1, 0.5, 1.0, 2.0, 5.0].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => applyInstrumentChange({ ...inputs, contracts: preset } as any)}
+                    className={`neu-btn px-2.5 py-2 rounded-lg text-xs font-mono-numbers cursor-pointer transition-colors ${
+                      (inputs as any).contracts === preset
+                        ? 'text-[var(--accent-cyan)] border border-[var(--accent-cyan)]/40 font-bold'
+                        : 'text-[var(--neu-text-secondary)] hover:text-[var(--neu-text-primary)]'
+                    }`}
+                  >
+                    {preset}
+                  </button>
+                ))
+              : [0.01, 0.1, 0.5, 1.0, 2.0].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => applyInstrumentChange({ ...inputs, lotSize: preset } as any)}
+                    className={`neu-btn px-2.5 py-2 rounded-lg text-xs font-mono-numbers cursor-pointer transition-colors ${
+                      (inputs as any).lotSize === preset
+                        ? 'text-[var(--accent-cyan)] border border-[var(--accent-cyan)]/40 font-bold'
+                        : 'text-[var(--neu-text-secondary)] hover:text-[var(--neu-text-primary)]'
+                    }`}
+                  >
+                    {preset.toFixed(2)}
+                  </button>
+                ))}
           </div>
         </div>
       </div>
@@ -286,7 +606,13 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
           <label className="text-xs font-semibold text-[var(--neu-text-secondary)]">
-            Entry Price
+            {isStocks
+              ? 'Entry Share Price'
+              : isCrypto
+              ? 'Entry Coin Price'
+              : isIndices
+              ? 'Entry Index Price'
+              : 'Entry Price'}
           </label>
           <button
             type="button"
@@ -294,7 +620,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             className="text-[10px] text-[var(--accent-cyan)] hover:underline cursor-pointer flex items-center gap-1 font-mono-numbers"
           >
             <Sparkles className="w-3 h-3" />
-            Set to {defaultPrice}
+            Set to {defaultPrice.toLocaleString()}
           </button>
         </div>
 
@@ -328,14 +654,14 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
           <div className="flex items-center gap-1 text-[10px] text-[var(--neu-text-muted)] flex-wrap">
             <span className="font-semibold">Quick SL:</span>
-            {slPresets.map((pips) => (
+            {slPresets.map((presetVal) => (
               <button
-                key={pips}
+                key={presetVal}
                 type="button"
-                onClick={() => applyPipsToStopLoss(pips)}
+                onClick={() => applyPipsToStopLoss(presetVal)}
                 className="neu-btn px-2 py-0.5 rounded text-[10px] font-mono-numbers text-[var(--accent-rose)] hover:bg-[var(--accent-rose)]/10 cursor-pointer"
               >
-                -{pips} pips
+                -{isStocks || isCrypto ? `$${presetVal}` : isIndices ? `${presetVal} pts` : `${presetVal} pips`}
               </button>
             ))}
           </div>
@@ -359,14 +685,14 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
           <div className="flex items-center gap-1 text-[10px] text-[var(--neu-text-muted)] flex-wrap">
             <span className="font-semibold">Quick TP:</span>
-            {tpPresets.map((pips) => (
+            {tpPresets.map((presetVal) => (
               <button
-                key={pips}
+                key={presetVal}
                 type="button"
-                onClick={() => applyPipsToTakeProfit(pips)}
+                onClick={() => applyPipsToTakeProfit(presetVal)}
                 className="neu-btn px-2 py-0.5 rounded text-[10px] font-mono-numbers text-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)]/10 cursor-pointer"
               >
-                +{pips} pips
+                +{isStocks || isCrypto ? `$${presetVal}` : isIndices ? `${presetVal} pts` : `${presetVal} pips`}
               </button>
             ))}
           </div>
@@ -375,3 +701,6 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     </div>
   );
 };
+
+
+

@@ -1,16 +1,8 @@
 import React from 'react';
-import {
-  ShieldCheck,
-  DollarSign,
-  Percent,
-  Compass,
-  Scale,
-  Activity,
-  Layers,
-} from 'lucide-react';
+import { Compass, Scale, Layers } from 'lucide-react';
 import type { CalculationResult } from '../../types/calculator';
 import { formatCurrency, formatPips, formatRatio } from '../../utils/formatting';
-import { getPositionUnitLabel, type ActiveCalculatorInputs } from '../../utils/instrumentDisplay';
+import type { ActiveCalculatorInputs } from '../../utils/instrumentDisplay';
 
 interface ResultSummaryProps {
   result: CalculationResult;
@@ -19,7 +11,6 @@ interface ResultSummaryProps {
 
 export const ResultSummary: React.FC<ResultSummaryProps> = ({ result, inputs }) => {
   const isHealthyMargin = result.freeMarginRemaining > 0;
-  const unitLabel = getPositionUnitLabel(inputs);
 
   return (
     <div className="neu-raised-card p-5 sm:p-6 space-y-5 border border-[var(--neu-border-subtle)]">
@@ -74,7 +65,13 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({ result, inputs }) 
             <div className="flex items-center justify-between border-b border-[var(--neu-border-subtle)]/50 pb-1.5">
               <span className="text-[var(--neu-text-muted)]">Position Units</span>
               <span className="font-semibold text-[var(--neu-text-primary)]">
-                {result.positionSizeUnits.toLocaleString()} units ({inputs.lotSize} lots)
+                {inputs.instrumentType === 'stocks'
+                  ? `${result.positionSizeUnits.toLocaleString()} shares`
+                  : inputs.instrumentType === 'crypto'
+                  ? `${result.positionSizeUnits} ${inputs.pair.split('/')[0]} coins`
+                  : inputs.instrumentType === 'indices'
+                  ? `${result.positionSizeUnits.toLocaleString()} contracts`
+                  : `${result.positionSizeUnits.toLocaleString()} units (${(inputs as any).lotSize} lots)`}
               </span>
             </div>
 
@@ -91,14 +88,29 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({ result, inputs }) 
         <div className="neu-inset p-4 rounded-xl space-y-3 font-mono-numbers">
           <div className="text-[11px] font-bold text-[var(--neu-text-secondary)] uppercase tracking-wider flex items-center gap-1.5 font-sans">
             <Compass className="w-3.5 h-3.5 text-[var(--accent-amber)]" />
-            <span>Risk, Reward & Pip Dynamics</span>
+            <span>Risk, Reward & Unit Dynamics</span>
           </div>
 
           <div className="space-y-2 pt-1">
             <div className="flex items-center justify-between border-b border-[var(--neu-border-subtle)]/50 pb-1.5">
-              <span className="text-[var(--neu-text-muted)]">1 Pip Value</span>
+              <span className="text-[var(--neu-text-muted)]">
+                {inputs.instrumentType === 'crypto'
+                  ? '$1.00 Coin Move Value'
+                  : inputs.instrumentType === 'stocks'
+                  ? '$0.01 Share Value'
+                  : inputs.instrumentType === 'indices'
+                  ? '1 Point Move Value'
+                  : '1 Pip Value'}
+              </span>
               <span className="font-bold text-[var(--neu-text-primary)]">
-                {formatCurrency(result.pipValue, inputs.accountCurrency)} / pip
+                {formatCurrency(result.pipValue, inputs.accountCurrency)} /{' '}
+                {inputs.instrumentType === 'crypto'
+                  ? '$1 move'
+                  : inputs.instrumentType === 'stocks'
+                  ? 'cent'
+                  : inputs.instrumentType === 'indices'
+                  ? 'point'
+                  : 'pip'}
               </span>
             </div>
 
@@ -123,7 +135,13 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({ result, inputs }) 
             <div className="flex items-center justify-between border-b border-[var(--neu-border-subtle)]/50 pb-1.5">
               <span className="text-[var(--neu-text-muted)]">Stop Loss Distance</span>
               <span className="font-semibold text-[var(--neu-text-primary)]">
-                {formatPips(result.stopLossDistancePips)}
+                {inputs.instrumentType === 'crypto' && result.stopLossDistancePips !== null
+                  ? `$${result.stopLossDistancePips.toLocaleString()} / coin`
+                  : inputs.instrumentType === 'stocks' && result.stopLossDistancePips !== null
+                  ? `$${result.stopLossDistancePips.toFixed(2)} / share`
+                  : inputs.instrumentType === 'indices' && result.stopLossDistancePips !== null
+                  ? `${result.stopLossDistancePips.toFixed(1)} points`
+                  : formatPips(result.stopLossDistancePips)}
               </span>
             </div>
 
@@ -139,3 +157,4 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({ result, inputs }) 
     </div>
   );
 };
+

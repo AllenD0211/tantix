@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TrendingUp, TrendingDown, Wifi } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import type { TickerItem } from '../../types/market';
 
 const INITIAL_PAIRS: TickerItem[] = [
@@ -51,11 +51,6 @@ export const TickerBar: React.FC = () => {
             <span className="text-[11px] font-bold tracking-wider uppercase text-[var(--neu-text-secondary)] font-mono-numbers">
               LD4 ECN FEED
             </span>
-          </div>
-
-          <div className="hidden sm:flex items-center gap-1 text-[11px] text-[var(--neu-text-muted)] font-mono-numbers">
-            <Wifi className="w-3 h-3 text-[var(--accent-cyan)]" />
-            <span>1.2ms</span>
           </div>
         </div>
 
