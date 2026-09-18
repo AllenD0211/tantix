@@ -48,15 +48,17 @@ export const InstrumentSelector: React.FC<InstrumentSelectorProps> = ({ selected
                 }
               }}
               disabled={!spec.supported}
-              className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all duration-200 select-none ${
+              className={`relative flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform active:scale-95 cursor-pointer select-none ${
                 isSelected
-                  ? 'neu-btn-primary shadow-[0_2px_12px_var(--accent-cyan-glow)]'
+                  ? 'neu-btn-primary shadow-[0_4px_16px_var(--accent-cyan-glow)] scale-[1.03] z-10 font-bold'
                   : spec.supported
-                  ? 'text-[var(--neu-text-secondary)] hover:text-[var(--neu-text-primary)] hover:bg-[var(--neu-surface-elevated)] cursor-pointer'
+                  ? 'text-[var(--neu-text-secondary)] hover:text-[var(--neu-text-primary)] hover:scale-[1.02] hover:bg-[var(--neu-surface-elevated)]'
                   : 'opacity-40 cursor-not-allowed text-[var(--neu-text-muted)]'
               }`}
             >
-              {getIcon(spec.id)}
+              <span className={`transition-transform duration-300 ${isSelected ? 'scale-110' : ''}`}>
+                {getIcon(spec.id)}
+              </span>
               <span className="truncate">{spec.name.split(' ')[0]}</span>
               {!spec.supported && (
                 <span className="text-[9px] px-1 py-0.2 rounded bg-[var(--neu-surface-active)] text-[var(--neu-text-muted)] font-mono-numbers">
