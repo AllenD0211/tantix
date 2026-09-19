@@ -12,6 +12,7 @@
   } from 'lucide-react';
   import type { UserSession } from '../../types/auth';
   import { evaluatePasswordStrength } from '../../utils/passwordPolicy';
+  import { supabase } from '../../../lib/supabase';
   import logoLight from '../../assets/1.png';
   import logoDark from '../../assets/2.png';
 
@@ -48,6 +49,40 @@
       setTimeout(() => setSuccessMessage(''), 3000);
     };
 
+    const handleLogin = async () => {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error(error.message);
+        setErrorMessage(error.message);
+        setIsLoading(false);
+        return null;
+      }
+
+      console.log('Logged in:', data.user);
+      return data;
+    };
+
+    const handleSignup = async () => {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error(error.message);
+        setErrorMessage(error.message);
+        setIsLoading(false);
+        return null;
+      }
+
+      console.log('Account created:', data.user);
+      return data;
+    };
+
     const handleSubmit = async (e: FormEvent) => {
       e.preventDefault();
       setErrorMessage('');
@@ -66,36 +101,55 @@
       setIsLoading(true);
 
       try {
-        setLoadingStep('Authenticating with London LD4 Gateway...');
-        await new Promise((resolve) => setTimeout(resolve, 450));
-
-        setLoadingStep('Verifying 256-bit encryption session...');
-        await new Promise((resolve) => setTimeout(resolve, 450));
-
-        setSuccessMessage(
-          activeTab === 'login'
-            ? 'Terminal authorized. Redirecting to workspace...'
-            : 'Demo Account provisioned! Loading workspace...'
-        );
-
-        setTimeout(() => {
-          setIsLoading(false);
-          if (onSuccessLogin) {
-            onSuccessLogin({
-              email,
-              server,
-              isDemo: server.includes('demo') || activeTab === 'register',
-              balance: 100000.0,
-              equity: 102450.0,
-              freeMargin: 98450.0,
-              marginLevel: 1420,
-              activeRiskPercent: 1.0,
-            });
+        if (activeTab === 'login') {
+          setLoadingStep('Authenticating with Supabase...');
+          const result = await handleLogin();
+          if (result && result.user) {
+            const user = result.user;
+            setSuccessMessage('Terminal authorized. Redirecting to workspace...');
+            setTimeout(() => {
+              setIsLoading(false);
+              if (onSuccessLogin) {
+                onSuccessLogin({
+                  email: user.email || email,
+                  server,
+                  isDemo: false,
+                  balance: 100000.0,
+                  equity: 102450.0,
+                  freeMargin: 98450.0,
+                  marginLevel: 1420,
+                  activeRiskPercent: 1.0,
+                });
+              }
+            }, 500);
           }
-        }, 500);
-      } catch {
+        } else {
+          setLoadingStep('Creating Supabase Account...');
+          const result = await handleSignup();
+          if (result && result.user) {
+            const user = result.user;
+            setSuccessMessage('Account created! Loading workspace...');
+            setTimeout(() => {
+              setIsLoading(false);
+              if (onSuccessLogin) {
+                onSuccessLogin({
+                  email: user.email || email,
+                  server,
+                  isDemo: false,
+                  balance: 100000.0,
+                  equity: 102450.0,
+                  freeMargin: 98450.0,
+                  marginLevel: 1420,
+                  activeRiskPercent: 1.0,
+                });
+              }
+            }, 500);
+          }
+        }
+      } catch (err: unknown) {
         setIsLoading(false);
-        setErrorMessage('Connection failed. Please retry.');
+        const message = err instanceof Error ? err.message : 'Connection failed. Please retry.';
+        setErrorMessage(message);
       }
     };
 
