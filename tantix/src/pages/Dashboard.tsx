@@ -7,8 +7,6 @@ import { InstrumentSelector } from '../components/calculator/InstrumentSelector'
 import { TradeAnalysisChart } from '../components/charts/TradeAnalysisChart';
 import { CalculatorForm } from '../components/calculator/CalculatorForm';
 import { ResultSummary } from '../components/calculator/ResultSummary';
-import {} from 'lucide-react';
-import { NeumorphicLogin } from '../components/auth/NeumorphicLogin';
 import {
   calculateTrade,
   getDefaultInputs,
@@ -35,16 +33,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [selectedInstrument, setSelectedInstrument] =
     useState<InstrumentType>('forex');
 
-  const [showLoginPanel, setShowLoginPanel] = useState(false);
-
   const sessionBalance = session?.balance || 10000;
-
-  // Close login panel automatically after successful login
-  useEffect(() => {
-    if (session) {
-      setShowLoginPanel(false);
-    }
-  }, [session]);
 
   // Listen for Supabase authentication changes
   useEffect(() => {
@@ -124,7 +113,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
         theme={theme}
         onToggleTheme={onToggleTheme}
         onSignOut={session ? onSignOut : undefined}
-        onSignIn={() => setShowLoginPanel(true)}
       />
 
       {/* =========================================================
@@ -203,8 +191,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <strong className="text-[var(--neu-text-primary)] font-semibold">
                   instrument, balance, leverage, and position size
                 </strong>
-                . Set your entry, stop-loss, and take-profit levels — the calculator
-                instantly computes your margin, potential P&L, and risk-to-reward ratio.
+                . Set your entry, stop loss, and take profit levels the calculator
+                instantly computes your margin, potential P&L, and risk to reward ratio.
               </p>
             </div>
 
@@ -229,7 +217,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </h3>
                 <p className="text-xs leading-[1.75] text-[var(--neu-text-secondary)]">
                   Position size directly impacts your margin requirement and profit/loss exposure.
-                  Larger positions amplify price movements — always factor in your
+                  Larger positions amplify price movements always factor in your
                   <strong className="text-[var(--neu-text-primary)] font-medium"> available balance and intended risk tolerance</strong> before sizing a trade.
                 </p>
               </div>
@@ -242,7 +230,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   The <strong className="text-[var(--neu-text-primary)] font-medium">risk-to-reward ratio</strong> compares
                   potential loss at your stop-loss to potential gain at your take-profit.
                   A $500 risk against a $1,250 reward gives a
-                  <strong className="text-[var(--neu-text-primary)] font-medium"> 1:2.50 R:R</strong> — a
+                  <strong className="text-[var(--neu-text-primary)] font-medium"> 1:2.50 R:R</strong> a
                   favourable setup for consistent profitability.
                 </p>
               </div>
@@ -254,7 +242,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <p className="text-xs leading-[1.75] text-[var(--neu-text-secondary)]">
                   A $1 move on <strong className="text-[var(--neu-text-primary)] font-medium">50 shares</strong> changes
                   the position value by <strong className="text-[var(--neu-text-primary)] font-medium">$50</strong>.
-                  Each asset class — Forex, Gold, Crypto, Stocks — has unique contract
+                  Each asset class Forex, Gold, Crypto, Stocks has unique contract
                   specifications that affect how price movements translate to P&L.
                 </p>
               </div>
@@ -280,7 +268,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   <h4 className="text-xs font-bold text-[var(--neu-text-primary)] mt-1 mb-1">Review the Results</h4>
                   <p className="text-[11px] leading-[1.65] text-[var(--neu-text-secondary)]">
                     The result summary shows your lot size, pip value, margin required,
-                    and risk-to-reward ratio — all updating in real time.
+                    and risk-to-reward ratio all updating in real time.
                   </p>
                 </div>
                 <div>
@@ -297,7 +285,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {/* Disclaimer */}
             <p className="pt-5 border-t border-[var(--neu-border-subtle)] text-[10px] leading-5 text-[var(--neu-text-muted)]">
               <strong className="text-[var(--neu-text-secondary)] font-semibold">Disclaimer:</strong>{' '}
-              Tantix.FX provides estimates based on user-entered values. Actual results may vary
+              Tantix provides estimates based on user-entered values. Actual results may vary
               depending on market conditions, broker specifications, spreads, commissions, swap rates,
               contract specifications, and other trading costs. This tool is for educational purposes
               and does not constitute financial advice.
@@ -307,68 +295,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
         </div>
       </div>
-
-      {/* =========================================================
-          LOGIN PANEL OVERLAY
-      ========================================================= */}
-      {showLoginPanel && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-200 cursor-pointer"
-            onClick={() => setShowLoginPanel(false)}
-          />
-
-          {/* Slide-in Login Panel */}
-          <div className="fixed right-0 top-0 h-full w-full max-w-[480px] z-50 flex flex-col bg-[var(--neu-bg)] shadow-2xl overflow-y-auto animate-slideInRight">
-
-            {/* Close Button */}
-            <div className="flex justify-end p-4">
-
-              <button
-                type="button"
-                onClick={() => setShowLoginPanel(false)}
-                className="neu-btn p-2 rounded-xl text-[var(--neu-text-muted)] hover:text-[var(--neu-text-primary)] cursor-pointer text-xs"
-              >
-                ✕ Close
-              </button>
-
-            </div>
-
-            {/* Login Content */}
-            <div className="flex-1 flex flex-col justify-center px-4 py-4">
-
-              {/* Hero Copy */}
-              <div className="mb-6 text-center">
-
-                <h2 className="text-2xl font-black text-[var(--neu-text-primary)] tracking-tight mb-2">
-                  Smarter Calculations.{' '}
-                  <span className="text-[var(--accent-cyan)] glow-cyan">
-                    Clearer Risk.
-                  </span>
-                </h2>
-
-                <p className="text-sm text-[var(--neu-text-secondary)] leading-relaxed">
-                  Get a clearer view of your margins, position risk,
-                  and potential trade outcomes.
-                </p>
-
-              </div>
-
-              {/* Login Component */}
-              <NeumorphicLogin
-                theme={theme}
-                onSuccessLogin={(userData) => {
-                  onLoginSuccess(userData);
-                  setShowLoginPanel(false);
-                }}
-              />
-
-            </div>
-
-          </div>
-        </>
-      )}
 
     </div>
   );

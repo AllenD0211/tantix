@@ -47,7 +47,7 @@ export class ForexCalculator implements InstrumentCalculatorService<ForexInputs>
       accountBalance: balance,
       direction: 'BUY',
       leverage: 100,
-      lotSize: 1.0,
+      lotSize: 0,
       entryPrice: 1.08500,
       stopLossPrice: 1.08000,
       takeProfitPrice: 1.09500,

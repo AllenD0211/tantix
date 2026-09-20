@@ -8,7 +8,7 @@ export const Footer: React.FC = () => {
           <span className="font-mono-numbers">Tantix.FX v1.1.0</span>
         </div>
 <p className="text-[10px] text-[var(--neu-text-muted)] opacity-80">
-  © {new Date().getFullYear()} Tantix.FX. All rights reserved. Trading calculations and risk analysis are provided for informational purposes only and do not constitute financial or investment advice.
+  © {new Date().getFullYear()} Tantix.FX. All rights reserved.
 </p>
       </div>
     </footer>

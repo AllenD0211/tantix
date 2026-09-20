@@ -42,7 +42,7 @@ export class CryptoCalculator implements InstrumentCalculatorService<CryptoInput
       accountBalance: balance,
       direction: 'BUY',
       leverage: 10,
-      coinAmount: 0.5,
+      coinAmount: 0,
       entryPrice: 65000.00,
       stopLossPrice: 63000.00,
       takeProfitPrice: 70000.00,

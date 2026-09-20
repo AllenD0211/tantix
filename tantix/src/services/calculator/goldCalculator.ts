@@ -65,7 +65,7 @@ export class GoldCalculator implements InstrumentCalculatorService<GoldInputs> {
       accountBalance: balance,
       direction: 'BUY',
       leverage: 100,
-      lotSize: 1.0,
+      lotSize: 0,
       entryPrice: metal.defaultPrice,
       stopLossPrice: Number((metal.defaultPrice - metal.pipSize * 100).toFixed(metal.digits)),
       takeProfitPrice: Number((metal.defaultPrice + metal.pipSize * 200).toFixed(metal.digits)),

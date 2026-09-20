@@ -42,7 +42,7 @@ export class IndexCalculator implements InstrumentCalculatorService<IndexInputs>
       accountBalance: balance,
       direction: 'BUY',
       leverage: 50,
-      contracts: 1,
+      contracts: 0,
       entryPrice: 42000.00,
       stopLossPrice: 41800.00,
       takeProfitPrice: 42400.00,

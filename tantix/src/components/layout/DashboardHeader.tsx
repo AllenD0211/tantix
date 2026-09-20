@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogOut, Sun, Moon, LogIn } from 'lucide-react';
+import { LogOut, Sun, Moon } from 'lucide-react';
 import type { UserSession } from '../../types/auth';
 import logoLight from '../../assets/1.png';
 import logoDark from '../../assets/2.png';
@@ -9,7 +9,6 @@ interface DashboardHeaderProps {
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
   onSignOut?: () => void;
-  onSignIn?: () => void;
 }
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
@@ -17,7 +16,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   theme,
   onToggleTheme,
   onSignOut,
-  onSignIn,
 }) => {
   return (
     <header className="w-full border-b border-[var(--neu-border-subtle)] bg-[var(--neu-bg)]/90 backdrop-blur-md px-4 sm:px-6 py-3 transition-colors duration-200">
@@ -49,7 +47,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
-          {session ? (
+          {session && (
             <button
               type="button"
               onClick={onSignOut}
@@ -58,16 +56,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Exit</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={onSignIn}
-              className="neu-btn-primary px-4 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all hover:scale-[1.03]"
-              title="Sign In or Create Account"
-            >
-              
-              <span>Sign In / Sign Up</span>
             </button>
           )}
         </div>

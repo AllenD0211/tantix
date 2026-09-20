@@ -41,7 +41,7 @@ export class StockCalculator implements InstrumentCalculatorService<StockInputs>
       accountBalance: balance,
       direction: 'BUY',
       leverage: 5,
-      shares: 50,
+      shares: 0,
       entryPrice: 225.00,
       stopLossPrice: 215.00,
       takeProfitPrice: 250.00,

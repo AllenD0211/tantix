@@ -488,10 +488,10 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
               <Input
                 type="number"
                 step="1"
-                min="1"
+                min="0"
                 max="100000"
                 suffix="Shares"
-                value={(inputs as any).shares || ''}
+                value={(inputs as any).shares ?? 0}
                 onChange={(e) =>
                   applyInstrumentChange({ ...inputs, shares: parseInt(e.target.value, 10) || 0 } as any)
                 }
@@ -501,10 +501,10 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
               <Input
                 type="number"
                 step="0.01"
-                min="0.001"
+                min="0"
                 max="10000"
                 suffix={cryptoInfo?.baseCoin || 'Coins'}
-                value={(inputs as any).coinAmount || ''}
+                value={(inputs as any).coinAmount ?? 0}
                 onChange={(e) =>
                   applyInstrumentChange({ ...inputs, coinAmount: parseFloat(e.target.value) || 0 } as any)
                 }
@@ -514,10 +514,10 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
               <Input
                 type="number"
                 step="0.01"
-                min="0.01"
+                min="0"
                 max="1000"
                 suffix="Contracts"
-                value={(inputs as any).contracts || ''}
+                value={(inputs as any).contracts ?? 0}
                 onChange={(e) =>
                   applyInstrumentChange({ ...inputs, contracts: parseFloat(e.target.value) || 0 } as any)
                 }
@@ -527,10 +527,10 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
               <Input
                 type="number"
                 step="0.01"
-                min="0.01"
+                min="0"
                 max="100"
                 suffix="Lots"
-                value={(inputs as any).lotSize || ''}
+                value={(inputs as any).lotSize ?? 0}
                 onChange={(e) =>
                   applyInstrumentChange({ ...inputs, lotSize: parseFloat(e.target.value) || 0 } as any)
                 }
