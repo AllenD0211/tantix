@@ -34,10 +34,6 @@ export const Login: React.FC<LoginProps> = ({
         <div className="w-full relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center animate-fadeIn">
           {/* Left Side - Header & Hero Pitch */}
           <div className="lg:col-span-6 flex flex-col justify-center text-center lg:text-left mb-6 lg:mb-0">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full neu-inset w-fit mx-auto lg:mx-0 text-[var(--accent-cyan)] text-xs font-bold uppercase tracking-wider mb-6">
-              <span className="w-2 h-2 rounded-full bg-[var(--accent-cyan)] animate-pulse" />
-              <span>Institutional Risk Engine</span>
-            </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[var(--neu-text-primary)] tracking-tight leading-[1.15] mb-6">
               Smarter Calculations.<br />
@@ -47,7 +43,7 @@ export const Login: React.FC<LoginProps> = ({
             </h1>
 
             <p className="text-sm sm:text-base text-[var(--neu-text-secondary)] font-mono-numbers leading-relaxed max-w-lg mx-auto lg:mx-0">
-              Model margins, evaluate position risk, and execute trades with real-time institutional precision.
+              Get a clearer view of your margins, position risk, and potential trade outcomes.
             </p>
           </div>
 

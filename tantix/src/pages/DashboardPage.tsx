@@ -71,11 +71,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-emerald)] animate-pulse" />
                   LIVE ECN
                 </span>
-                {session.isDemo && (
-                  <span className="text-[10px] font-mono-numbers px-2 py-0.5 rounded-full neu-inset text-[var(--accent-amber)]">
-                    DEMO
-                  </span>
-                )}
               </div>
               <p className="text-xs text-[var(--neu-text-secondary)] font-mono-numbers mt-0.5">
                 {session.email} • {session.server}

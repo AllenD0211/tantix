@@ -1,14 +1,15 @@
 import React from 'react';
-import { LogOut, Sun, Moon } from 'lucide-react';
+import { LogOut, Sun, Moon, LogIn } from 'lucide-react';
 import type { UserSession } from '../../types/auth';
 import logoLight from '../../assets/1.png';
 import logoDark from '../../assets/2.png';
 
 interface DashboardHeaderProps {
-  session: UserSession;
+  session: UserSession | null;
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
-  onSignOut: () => void;
+  onSignOut?: () => void;
+  onSignIn?: () => void;
 }
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
@@ -16,6 +17,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   theme,
   onToggleTheme,
   onSignOut,
+  onSignIn,
 }) => {
   return (
     <header className="w-full border-b border-[var(--neu-border-subtle)] bg-[var(--neu-bg)]/90 backdrop-blur-md px-4 sm:px-6 py-3 transition-colors duration-200">
@@ -24,15 +26,17 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <img
             src={theme === 'dark' ? logoDark : logoLight}
             alt="Tantix.FX Logo"
-            className="h-7 sm:h-8 w-auto object-contain shrink-0"
+            className="h-5 sm:h-6 w-auto object-contain shrink-0"
           />
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] font-mono-numbers px-2 py-0.5 rounded-full neu-inset text-[var(--accent-cyan)]">
-                {session.email}
-              </span>
+          {session && (
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-mono-numbers px-2 py-0.5 rounded-full neu-inset text-[var(--accent-cyan)]">
+                  {session.email}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
@@ -45,15 +49,27 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
-          <button
-            type="button"
-            onClick={onSignOut}
-            className="neu-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-[var(--neu-text-muted)] hover:text-[var(--accent-rose)] flex items-center gap-1.5 cursor-pointer transition-colors"
-            title="Return to Login"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Exit</span>
-          </button>
+          {session ? (
+            <button
+              type="button"
+              onClick={onSignOut}
+              className="neu-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-[var(--neu-text-muted)] hover:text-[var(--accent-rose)] flex items-center gap-1.5 cursor-pointer transition-colors"
+              title="Sign Out"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Exit</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onSignIn}
+              className="neu-btn-primary px-4 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all hover:scale-[1.03]"
+              title="Sign In or Create Account"
+            >
+              
+              <span>Sign In / Sign Up</span>
+            </button>
+          )}
         </div>
       </div>
     </header>
