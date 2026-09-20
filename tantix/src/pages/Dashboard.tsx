@@ -7,13 +7,7 @@ import { InstrumentSelector } from '../components/calculator/InstrumentSelector'
 import { TradeAnalysisChart } from '../components/charts/TradeAnalysisChart';
 import { CalculatorForm } from '../components/calculator/CalculatorForm';
 import { ResultSummary } from '../components/calculator/ResultSummary';
-import {
-  Info,
-  Calculator,
-  ShieldCheck,
-  Scale,
-  TrendingUp,
-} from 'lucide-react';
+import {} from 'lucide-react';
 import { NeumorphicLogin } from '../components/auth/NeumorphicLogin';
 import {
   calculateTrade,
@@ -193,295 +187,121 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {/* =====================================================
               TRADING GUIDE
           ===================================================== */}
-          <section className="pt-6">
+          <section className="pt-8 pb-2 space-y-8">
 
-            <div className="neu-card p-6 sm:p-8">
-
-              {/* -------------------------------------------------
-                  GUIDE HEADER
-              ------------------------------------------------- */}
-              <div className="mb-10">
-
-                <div className="flex items-center gap-2 mb-3">
-                  <Info
-                    className="w-4 h-4 text-[var(--accent-cyan)]"
-                  />
-
-                  <span className="text-xs font-semibold uppercase tracking-widest text-[var(--accent-cyan)]">
-                    Trading Guide
-                  </span>
-                </div>
-
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-[var(--neu-text-primary)]">
-                  How to Calculate a Trade
-                </h2>
-
-                <p className="mt-5 max-w-3xl text-sm sm:text-base leading-7 text-[var(--neu-text-secondary)]">
-                  Select your{' '}
-                  <strong className="text-[var(--neu-text-primary)]">
-                    trading asset, instrument, account balance, leverage,
-                    and position size
-                  </strong>
-                  . Enter your entry, stop-loss, and take-profit prices,
-                  then click Calculate to view your estimated margin,
-                  potential profit or loss, and risk-to-reward ratio.
-                </p>
-
-              </div>
-
-              {/* -------------------------------------------------
-                  GUIDE CARDS
-              ------------------------------------------------- */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-                {/* Understanding Margin */}
-                <div className="neu-card p-5">
-
-                  <div className="flex items-center gap-3 mb-4">
-
-                    <div className="neu-icon p-2 rounded-xl">
-                      <Calculator
-                        className="w-4 h-4 text-[var(--accent-cyan)]"
-                      />
-                    </div>
-
-                    <h3 className="text-base font-bold text-[var(--neu-text-primary)]">
-                      Understanding Margin
-                    </h3>
-
-                  </div>
-
-                  <p className="text-sm leading-6 text-[var(--neu-text-secondary)]">
-                    Margin is the amount of funds required to open a
-                    leveraged position. It depends on the{' '}
-                    <strong className="text-[var(--neu-text-primary)]">
-                      position value, leverage, and asset type
-                    </strong>
-                    .
-                  </p>
-
-                  <p className="mt-3 text-sm leading-6 text-[var(--neu-text-secondary)]">
-                    For example, a $10,000 position with{' '}
-                    <strong className="text-[var(--neu-text-primary)]">
-                      1:5 leverage
-                    </strong>{' '}
-                    would require approximately{' '}
-                    <strong className="text-[var(--neu-text-primary)]">
-                      $2,000 in margin
-                    </strong>
-                    , before asset-specific requirements or trading
-                    costs.
-                  </p>
-
-                </div>
-
-                {/* Managing Position Size */}
-                <div className="neu-card p-5">
-
-                  <div className="flex items-center gap-3 mb-4">
-
-                    <div className="neu-icon p-2 rounded-xl">
-                      <Scale
-                        className="w-4 h-4 text-[var(--accent-cyan)]"
-                      />
-                    </div>
-
-                    <h3 className="text-base font-bold text-[var(--neu-text-primary)]">
-                      Managing Position Size
-                    </h3>
-
-                  </div>
-
-                  <p className="text-sm leading-6 text-[var(--neu-text-secondary)]">
-                    Your position size affects both the required margin
-                    and the potential profit or loss. A larger position
-                    means greater exposure to price movements.
-                  </p>
-
-                  <p className="mt-3 text-sm leading-6 text-[var(--neu-text-secondary)]">
-                    Consider your available balance and planned risk
-                    when choosing your position size.
-                  </p>
-
-                </div>
-
-                {/* Understanding Risk & Reward */}
-                <div className="neu-card p-5">
-
-                  <div className="flex items-center gap-3 mb-4">
-
-                    <div className="neu-icon p-2 rounded-xl">
-                      <ShieldCheck
-                        className="w-4 h-4 text-[var(--accent-cyan)]"
-                      />
-                    </div>
-
-                    <h3 className="text-base font-bold text-[var(--neu-text-primary)]">
-                      Understanding Risk &amp; Reward
-                    </h3>
-
-                  </div>
-
-                  <p className="text-sm leading-6 text-[var(--neu-text-secondary)]">
-                    The{' '}
-                    <strong className="text-[var(--neu-text-primary)]">
-                      Risk-to-Reward Ratio
-                    </strong>{' '}
-                    compares the potential loss at your stop-loss with
-                    the potential gain at your take-profit.
-                  </p>
-
-                  <p className="mt-3 text-sm leading-6 text-[var(--neu-text-secondary)]">
-                    For example, a potential loss of{' '}
-                    <strong className="text-[var(--neu-text-primary)]">
-                      $500
-                    </strong>{' '}
-                    and a potential profit of{' '}
-                    <strong className="text-[var(--neu-text-primary)]">
-                      $1,250
-                    </strong>{' '}
-                    gives a{' '}
-                    <strong className="text-[var(--neu-text-primary)]">
-                      1:2.50 risk-to-reward ratio
-                    </strong>
-                    .
-                  </p>
-
-                </div>
-
-                {/* Understanding Price Movement */}
-                <div className="neu-card p-5">
-
-                  <div className="flex items-center gap-3 mb-4">
-
-                    <div className="neu-icon p-2 rounded-xl">
-                      <TrendingUp
-                        className="w-4 h-4 text-[var(--accent-cyan)]"
-                      />
-                    </div>
-
-                    <h3 className="text-base font-bold text-[var(--neu-text-primary)]">
-                      Understanding Price Movement
-                    </h3>
-
-                  </div>
-
-                  <p className="text-sm leading-6 text-[var(--neu-text-secondary)]">
-                    The effect of a price change depends on the{' '}
-                    <strong className="text-[var(--neu-text-primary)]">
-                      asset and position size
-                    </strong>
-                    .
-                  </p>
-
-                  <p className="mt-3 text-sm leading-6 text-[var(--neu-text-secondary)]">
-                    For example, if you hold{' '}
-                    <strong className="text-[var(--neu-text-primary)]">
-                      50 shares
-                    </strong>{' '}
-                    and the price moves by{' '}
-                    <strong className="text-[var(--neu-text-primary)]">
-                      $1
-                    </strong>
-                    , the position value changes by{' '}
-                    <strong className="text-[var(--neu-text-primary)]">
-                      $50
-                    </strong>
-                    .
-                  </p>
-
-                  <p className="mt-3 text-xs leading-5 text-[var(--neu-text-muted)]">
-                    Price movement calculations may differ across Forex,
-                    Gold, Stocks, Crypto, and other assets based on their
-                    contract or unit specifications.
-                  </p>
-
-                </div>
-
-              </div>
-              <div className="mt-8 border-t border-[var(--neu-shadow-dark)] pt-7">
-
-                <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--neu-text-primary)] mb-5">
-                  How It Works
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-
-                  {/* Step 1 */}
-                  <div className="flex gap-3">
-
-                    <span className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-[var(--accent-cyan)] text-black text-xs font-bold">
-                      1
-                    </span>
-
-                    <div>
-                      <h4 className="text-sm font-semibold text-[var(--neu-text-primary)]">
-                        Enter Trade Details
-                      </h4>
-
-                      <p className="mt-1 text-xs leading-5 text-[var(--neu-text-secondary)]">
-                        Select your asset and enter the values for your
-                        planned position.
-                      </p>
-                    </div>
-
-                  </div>
-
-                  {/* Step 2 */}
-                  <div className="flex gap-3">
-
-                    <span className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-[var(--accent-cyan)] text-black text-xs font-bold">
-                      2
-                    </span>
-
-                    <div>
-                      <h4 className="text-sm font-semibold text-[var(--neu-text-primary)]">
-                        Review the Results
-                      </h4>
-
-                      <p className="mt-1 text-xs leading-5 text-[var(--neu-text-secondary)]">
-                        Check your margin, risk, reward, and position
-                        details.
-                      </p>
-                    </div>
-
-                  </div>
-
-                  {/* Step 3 */}
-                  <div className="flex gap-3">
-
-                    <span className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-[var(--accent-cyan)] text-black text-xs font-bold">
-                      3
-                    </span>
-
-                    <div>
-                      <h4 className="text-sm font-semibold text-[var(--neu-text-primary)]">
-                        Analyze the Outcome
-                      </h4>
-
-                      <p className="mt-1 text-xs leading-5 text-[var(--neu-text-secondary)]">
-                        Use the chart to understand the potential
-                        profit and loss scenarios.
-                      </p>
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-              {/* -------------------------------------------------
-                  DISCLAIMER
-              ------------------------------------------------- */}
-              <p className="mt-7 text-[11px] leading-5 text-[var(--neu-text-muted)]">
-                Tantix.FX provides estimates based on the values entered
-                by the user. Actual results may vary depending on market
-                conditions, broker specifications, spreads, commissions,
-                contract specifications, and other trading costs.
+            {/* Header */}
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--accent-cyan)] mb-3 block">
+                Trading Guide
+              </span>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[var(--neu-text-primary)] leading-[1.1]">
+                How to Calculate{' '}
+                <span className="text-[var(--accent-cyan)]">a Trade</span>
+              </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--neu-text-secondary)]">
+                Configure your{' '}
+                <strong className="text-[var(--neu-text-primary)] font-semibold">
+                  instrument, balance, leverage, and position size
+                </strong>
+                . Set your entry, stop-loss, and take-profit levels — the calculator
+                instantly computes your margin, potential P&L, and risk-to-reward ratio.
               </p>
+            </div>
+
+            {/* Concepts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
+
+              <div>
+                <h3 className="text-sm font-bold text-[var(--neu-text-primary)] mb-1.5">
+                  Understanding Margin
+                </h3>
+                <p className="text-xs leading-[1.75] text-[var(--neu-text-secondary)]">
+                  Margin is the capital required to open a leveraged position, determined by
+                  <strong className="text-[var(--neu-text-primary)] font-medium"> position value, leverage, and asset type</strong>.
+                  A $10,000 position at <strong className="text-[var(--neu-text-primary)] font-medium">1:5 leverage</strong> requires
+                  roughly <strong className="text-[var(--neu-text-primary)] font-medium">$2,000 in margin</strong>.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-bold text-[var(--neu-text-primary)] mb-1.5">
+                  Managing Position Size
+                </h3>
+                <p className="text-xs leading-[1.75] text-[var(--neu-text-secondary)]">
+                  Position size directly impacts your margin requirement and profit/loss exposure.
+                  Larger positions amplify price movements — always factor in your
+                  <strong className="text-[var(--neu-text-primary)] font-medium"> available balance and intended risk tolerance</strong> before sizing a trade.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-bold text-[var(--neu-text-primary)] mb-1.5">
+                  Risk &amp; Reward Analysis
+                </h3>
+                <p className="text-xs leading-[1.75] text-[var(--neu-text-secondary)]">
+                  The <strong className="text-[var(--neu-text-primary)] font-medium">risk-to-reward ratio</strong> compares
+                  potential loss at your stop-loss to potential gain at your take-profit.
+                  A $500 risk against a $1,250 reward gives a
+                  <strong className="text-[var(--neu-text-primary)] font-medium"> 1:2.50 R:R</strong> — a
+                  favourable setup for consistent profitability.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-bold text-[var(--neu-text-primary)] mb-1.5">
+                  Price Movement Impact
+                </h3>
+                <p className="text-xs leading-[1.75] text-[var(--neu-text-secondary)]">
+                  A $1 move on <strong className="text-[var(--neu-text-primary)] font-medium">50 shares</strong> changes
+                  the position value by <strong className="text-[var(--neu-text-primary)] font-medium">$50</strong>.
+                  Each asset class — Forex, Gold, Crypto, Stocks — has unique contract
+                  specifications that affect how price movements translate to P&L.
+                </p>
+              </div>
 
             </div>
+
+            {/* How It Works */}
+            <div className="pt-6 border-t border-[var(--neu-border-subtle)]">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--neu-text-muted)] mb-5">
+                How It Works
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div>
+                  <span className="text-[var(--accent-cyan)] text-xs font-bold font-mono-numbers">01</span>
+                  <h4 className="text-xs font-bold text-[var(--neu-text-primary)] mt-1 mb-1">Enter Trade Details</h4>
+                  <p className="text-[11px] leading-[1.65] text-[var(--neu-text-secondary)]">
+                    Select an instrument from the tabs above and fill in your account balance,
+                    entry price, stop-loss, and take-profit levels.
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[var(--accent-cyan)] text-xs font-bold font-mono-numbers">02</span>
+                  <h4 className="text-xs font-bold text-[var(--neu-text-primary)] mt-1 mb-1">Review the Results</h4>
+                  <p className="text-[11px] leading-[1.65] text-[var(--neu-text-secondary)]">
+                    The result summary shows your lot size, pip value, margin required,
+                    and risk-to-reward ratio — all updating in real time.
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[var(--accent-cyan)] text-xs font-bold font-mono-numbers">03</span>
+                  <h4 className="text-xs font-bold text-[var(--neu-text-primary)] mt-1 mb-1">Analyze the Outcome</h4>
+                  <p className="text-[11px] leading-[1.65] text-[var(--neu-text-secondary)]">
+                    Use the trade analysis chart to visualize your potential profit and loss
+                    scenarios before committing to a position.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Disclaimer */}
+            <p className="pt-5 border-t border-[var(--neu-border-subtle)] text-[10px] leading-5 text-[var(--neu-text-muted)]">
+              <strong className="text-[var(--neu-text-secondary)] font-semibold">Disclaimer:</strong>{' '}
+              Tantix.FX provides estimates based on user-entered values. Actual results may vary
+              depending on market conditions, broker specifications, spreads, commissions, swap rates,
+              contract specifications, and other trading costs. This tool is for educational purposes
+              and does not constitute financial advice.
+            </p>
 
           </section>
 
