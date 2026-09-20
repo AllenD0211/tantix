@@ -1,5 +1,53 @@
 @import "tailwindcss";
 
+@property --neu-bg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #0c0f17;
+}
+
+@property --neu-surface {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #141824;
+}
+
+@property --neu-surface-elevated {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1a2030;
+}
+
+@property --neu-text-primary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f8fafc;
+}
+
+@property --neu-text-secondary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #94a3b8;
+}
+
+@property --neu-text-muted {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #64748b;
+}
+
+@property --neu-border-subtle {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(255, 255, 255, 0.08);
+}
+
+@property --accent-cyan {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #00e5ff;
+}
+
 :root {
   /* Modern Dark (Clean Institutional Fintech) */
   --neu-bg: #0c0f17;
@@ -85,6 +133,9 @@ html, body {
   color: var(--neu-text-primary);
   min-height: 100vh;
   overflow-x: hidden;
+  transition:
+    background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #root {
@@ -93,48 +144,88 @@ html, body {
   flex-direction: column;
 }
 
+html.theme-to-dark,
+html.theme-to-dark body {
+  transition-duration: 0.9s;
+}
+
 /* Smooth theme morph for browsers without View Transitions */
 html.theme-animating,
 html.theme-animating *,
 html.theme-animating *::before,
 html.theme-animating *::after {
   transition:
-    background-color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    background 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    fill 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    stroke 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    text-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    background-color 0.75s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.75s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.75s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.75s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.75s cubic-bezier(0.4, 0, 0.2, 1),
+    fill 0.75s cubic-bezier(0.4, 0, 0.2, 1),
+    stroke 0.75s cubic-bezier(0.4, 0, 0.2, 1),
+    text-shadow 0.75s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* Full-dashboard light/dark wipe */
+html.theme-animating.theme-to-dark,
+html.theme-animating.theme-to-dark *,
+html.theme-animating.theme-to-dark *::before,
+html.theme-animating.theme-to-dark *::after {
+  transition-duration: 0.9s !important;
+}
+
+::view-transition-group(root) {
+  animation-duration: 0.75s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation: none;
   mix-blend-mode: normal;
+  animation-duration: 0.75s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 ::view-transition-old(root) {
   z-index: 1;
+  animation-name: theme-fade-out;
 }
 
 ::view-transition-new(root) {
   z-index: 2;
-  animation: theme-wipe 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-name: theme-fade-in;
 }
 
-@keyframes theme-wipe {
+html.theme-to-dark::view-transition-group(root),
+html.theme-to-dark::view-transition-old(root),
+html.theme-to-dark::view-transition-new(root) {
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.33, 1, 0.32, 1);
+}
+
+@keyframes theme-fade-out {
   from {
-    clip-path: circle(0px at var(--theme-x, 92%) var(--theme-y, 6%));
+    opacity: 1;
+    filter: brightness(1);
   }
   to {
-    clip-path: circle(150vmax at var(--theme-x, 92%) var(--theme-y, 6%));
+    opacity: 0;
+    filter: brightness(0.92);
+  }
+}
+
+@keyframes theme-fade-in {
+  from {
+    opacity: 0;
+    filter: brightness(0.86);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html,
+  body,
   html.theme-animating,
   html.theme-animating *,
   html.theme-animating *::before,

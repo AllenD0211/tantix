@@ -29,27 +29,38 @@ export function App() {
 
   const toggleTheme = (event?: MouseEvent<HTMLButtonElement>) => {
     const next: Theme = theme === 'dark' ? 'light' : 'dark';
+    const root = document.documentElement;
 
     if (event) {
-      document.documentElement.style.setProperty('--theme-x', `${event.clientX}px`);
-      document.documentElement.style.setProperty('--theme-y', `${event.clientY}px`);
+      root.style.setProperty('--theme-x', `${event.clientX}px`);
+      root.style.setProperty('--theme-y', `${event.clientY}px`);
     }
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const startViewTransition = document.startViewTransition?.bind(document);
+    const durationMs = next === 'dark' ? 900 : 700;
+
+    root.classList.remove('theme-to-dark', 'theme-to-light');
+    root.classList.add(next === 'dark' ? 'theme-to-dark' : 'theme-to-light');
+
+    const finish = () => {
+      window.setTimeout(() => {
+        root.classList.remove('theme-to-dark', 'theme-to-light', 'theme-animating');
+      }, durationMs);
+    };
 
     if (reduceMotion || !startViewTransition) {
-      document.documentElement.classList.add('theme-animating');
+      root.classList.add('theme-animating');
       applyTheme(next);
-      window.setTimeout(() => {
-        document.documentElement.classList.remove('theme-animating');
-      }, 520);
+      finish();
       return;
     }
 
-    startViewTransition(() => {
+    const transition = startViewTransition(() => {
       applyTheme(next);
     });
+
+    transition.finished.finally(finish);
   };
 
   return (
