@@ -24,7 +24,7 @@ export const NeumorphicLogin: React.FC<NeumorphicLoginProps> = ({ onSuccessLogin
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [server, setServer] = useState('tantix-live-01');
+  const [server] = useState('tantix-live-01');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
@@ -35,21 +35,10 @@ export const NeumorphicLogin: React.FC<NeumorphicLoginProps> = ({ onSuccessLogin
   const [successMessage, setSuccessMessage] = useState('');
 
   const handleLogin = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-
-    if (error) {
-      console.error(error.message);
-      setErrorMessage(error.message);
-      setIsLoading(false);
-      return null;
-    }
-
-    console.log('Logged in:', data.user);
-    return data;
-  };
 
   const handleSignup = async () => {
     const { data, error } = await supabase.auth.signUp({

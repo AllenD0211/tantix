@@ -1,0 +1,7 @@
+{
+  "installCommand": "npm install --prefix tantix",
+  "buildCommand": "npm run build --prefix tantix",
+  "outputDirectory": "tantix/dist",
+  "framework": null,
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}

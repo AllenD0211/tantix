@@ -1,0 +1,8 @@
+{
+  "name": "tantix-fx",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix tantix",
+    "build": "npm run build --prefix tantix"
+  }
+}
