@@ -34,18 +34,18 @@ export function findCryptoInfo(pair: string): CryptoInfo {
 export class CryptoCalculator implements InstrumentCalculatorService<CryptoInputs> {
   public instrumentType = 'crypto' as const;
 
-  public getDefaults(balance: number = 10000): CryptoInputs {
+  public getDefaults(_balance: number = 10000): CryptoInputs {
     return {
       instrumentType: 'crypto',
       pair: 'BTC/USD',
       accountCurrency: 'USD',
-      accountBalance: balance,
+      accountBalance: 0,
       direction: 'BUY',
       leverage: 10,
       coinAmount: 0,
-      entryPrice: 65000.00,
-      stopLossPrice: 63000.00,
-      takeProfitPrice: 70000.00,
+      entryPrice: 0,
+      stopLossPrice: undefined,
+      takeProfitPrice: undefined,
     };
   }
 

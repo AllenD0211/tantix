@@ -20,7 +20,7 @@ export interface DashboardProps {
   onLoginSuccess: (session: UserSession) => void;
   onSignOut: () => void;
   theme: 'dark' | 'light';
-  onToggleTheme: () => void;
+  onToggleTheme: (event?: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({

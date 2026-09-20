@@ -39,18 +39,18 @@ export function findPairInfo(symbol: string): CurrencyPairInfo {
 export class ForexCalculator implements InstrumentCalculatorService<ForexInputs> {
   public instrumentType = 'forex' as const;
 
-  public getDefaults(balance: number = 10000): ForexInputs {
+  public getDefaults(_balance: number = 10000): ForexInputs {
     return {
       instrumentType: 'forex',
       pair: 'EUR/USD',
       accountCurrency: 'USD',
-      accountBalance: balance,
+      accountBalance: 0,
       direction: 'BUY',
       leverage: 100,
       lotSize: 0,
-      entryPrice: 1.08500,
-      stopLossPrice: 1.08000,
-      takeProfitPrice: 1.09500,
+      entryPrice: 0,
+      stopLossPrice: undefined,
+      takeProfitPrice: undefined,
     };
   }
 

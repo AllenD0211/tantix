@@ -33,18 +33,18 @@ export function findStockInfo(symbol: string): StockInfo {
 export class StockCalculator implements InstrumentCalculatorService<StockInputs> {
   public instrumentType = 'stocks' as const;
 
-  public getDefaults(balance: number = 10000): StockInputs {
+  public getDefaults(_balance: number = 10000): StockInputs {
     return {
       instrumentType: 'stocks',
       symbol: 'AAPL',
       accountCurrency: 'USD',
-      accountBalance: balance,
+      accountBalance: 0,
       direction: 'BUY',
       leverage: 5,
       shares: 0,
-      entryPrice: 225.00,
-      stopLossPrice: 215.00,
-      takeProfitPrice: 250.00,
+      entryPrice: 0,
+      stopLossPrice: undefined,
+      takeProfitPrice: undefined,
     };
   }
 

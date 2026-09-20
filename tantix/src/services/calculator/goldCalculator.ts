@@ -56,19 +56,19 @@ export function findMetalInfo(symbol: string): MetalSpec {
 export class GoldCalculator implements InstrumentCalculatorService<GoldInputs> {
   public instrumentType = 'gold' as const;
 
-  public getDefaults(balance: number = 10000): GoldInputs {
+  public getDefaults(_balance: number = 10000): GoldInputs {
     const metal = findMetalInfo('XAU/USD');
     return {
       instrumentType: 'gold',
       symbol: metal.symbol,
       accountCurrency: 'USD',
-      accountBalance: balance,
+      accountBalance: 0,
       direction: 'BUY',
       leverage: 100,
       lotSize: 0,
-      entryPrice: metal.defaultPrice,
-      stopLossPrice: Number((metal.defaultPrice - metal.pipSize * 100).toFixed(metal.digits)),
-      takeProfitPrice: Number((metal.defaultPrice + metal.pipSize * 200).toFixed(metal.digits)),
+      entryPrice: 0,
+      stopLossPrice: undefined,
+      takeProfitPrice: undefined,
     };
   }
 

@@ -84,7 +84,6 @@ html, body {
   background-color: var(--neu-bg);
   color: var(--neu-text-primary);
   min-height: 100vh;
-  transition: background-color 0.25s ease, color 0.25s ease;
   overflow-x: hidden;
 }
 
@@ -92,6 +91,59 @@ html, body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* Smooth theme morph for browsers without View Transitions */
+html.theme-animating,
+html.theme-animating *,
+html.theme-animating *::before,
+html.theme-animating *::after {
+  transition:
+    background-color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    fill 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    stroke 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    text-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* Full-dashboard light/dark wipe */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+  animation: theme-wipe 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes theme-wipe {
+  from {
+    clip-path: circle(0px at var(--theme-x, 92%) var(--theme-y, 6%));
+  }
+  to {
+    clip-path: circle(150vmax at var(--theme-x, 92%) var(--theme-y, 6%));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-animating,
+  html.theme-animating *,
+  html.theme-animating *::before,
+  html.theme-animating *::after,
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 /* === REFINED MODERN CARDS & SURFACES === */
@@ -220,6 +272,20 @@ html, body {
 .neu-btn-primary:active {
   transform: scale(0.985);
   box-shadow: 0 2px 8px var(--accent-cyan-glow);
+}
+
+.asset-class-pill {
+  background: linear-gradient(135deg, #00d2ff, #0088ff);
+  box-shadow: 0 4px 14px var(--accent-cyan-glow);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  will-change: transform, width, height;
+}
+
+.asset-class-pill-ready {
+  transition:
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Neumorphic / Modern Input Focus States */

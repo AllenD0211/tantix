@@ -84,131 +84,44 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
   const handleForexPairChange = (symbol: string) => {
     if (inputs.instrumentType !== 'forex') return;
-    const pair = findPairInfo(symbol);
-    const isBuy = inputs.direction === 'BUY';
-    const entry = pair.defaultPrice;
-    const pipDiff = pair.pipSize * 50;
-    const tpDiff = pair.pipSize * 100;
-
-    applyInstrumentChange({
-      ...inputs,
-      pair: symbol,
-      entryPrice: entry,
-      stopLossPrice: isBuy
-        ? Number((entry - pipDiff).toFixed(pair.digits))
-        : Number((entry + pipDiff).toFixed(pair.digits)),
-      takeProfitPrice: isBuy
-        ? Number((entry + tpDiff).toFixed(pair.digits))
-        : Number((entry - tpDiff).toFixed(pair.digits)),
-    });
+    applyInstrumentChange({ ...inputs, pair: symbol });
   };
 
   const handleMetalChange = (symbol: string) => {
     if (inputs.instrumentType !== 'gold') return;
-    const metal = findMetalInfo(symbol);
-    const isBuy = inputs.direction === 'BUY';
-    const entry = metal.defaultPrice;
-    const slDiff = metal.pipSize * 100;
-    const tpDiff = metal.pipSize * 200;
-
-    applyInstrumentChange({
-      ...inputs,
-      symbol,
-      entryPrice: entry,
-      stopLossPrice: isBuy
-        ? Number((entry - slDiff).toFixed(metal.digits))
-        : Number((entry + slDiff).toFixed(metal.digits)),
-      takeProfitPrice: isBuy
-        ? Number((entry + tpDiff).toFixed(metal.digits))
-        : Number((entry - tpDiff).toFixed(metal.digits)),
-    });
+    applyInstrumentChange({ ...inputs, symbol });
   };
 
   const handleStockChange = (symbol: string) => {
     if (inputs.instrumentType !== 'stocks') return;
-    const stock = findStockInfo(symbol);
-    const isBuy = inputs.direction === 'BUY';
-    const entry = stock.defaultPrice;
-    const slDiff = 10;
-    const tpDiff = 25;
-
-    applyInstrumentChange({
-      ...inputs,
-      symbol,
-      entryPrice: entry,
-      stopLossPrice: isBuy
-        ? Number((entry - slDiff).toFixed(2))
-        : Number((entry + slDiff).toFixed(2)),
-      takeProfitPrice: isBuy
-        ? Number((entry + tpDiff).toFixed(2))
-        : Number((entry - tpDiff).toFixed(2)),
-    });
+    applyInstrumentChange({ ...inputs, symbol });
   };
 
   const handleCryptoChange = (pair: string) => {
     if (inputs.instrumentType !== 'crypto') return;
-    const crypto = findCryptoInfo(pair);
-    const isBuy = inputs.direction === 'BUY';
-    const entry = crypto.defaultPrice;
-    const slDiff = entry * 0.05; // 5% default SL
-    const tpDiff = entry * 0.10; // 10% default TP
-
-    applyInstrumentChange({
-      ...inputs,
-      pair,
-      entryPrice: entry,
-      stopLossPrice: isBuy
-        ? Number((entry - slDiff).toFixed(crypto.digits))
-        : Number((entry + slDiff).toFixed(crypto.digits)),
-      takeProfitPrice: isBuy
-        ? Number((entry + tpDiff).toFixed(crypto.digits))
-        : Number((entry - tpDiff).toFixed(crypto.digits)),
-    });
+    applyInstrumentChange({ ...inputs, pair });
   };
 
   const handleIndexChange = (symbol: string) => {
     if (inputs.instrumentType !== 'indices') return;
-    const index = findPointIndexInfo(symbol);
-    const isBuy = inputs.direction === 'BUY';
-    const entry = index.defaultPrice;
-    const slDiff = symbol === 'SPX500' ? 50 : 200;
-    const tpDiff = symbol === 'SPX500' ? 100 : 400;
-
-    applyInstrumentChange({
-      ...inputs,
-      symbol,
-      entryPrice: entry,
-      stopLossPrice: isBuy
-        ? Number((entry - slDiff).toFixed(index.digits))
-        : Number((entry + slDiff).toFixed(index.digits)),
-      takeProfitPrice: isBuy
-        ? Number((entry + tpDiff).toFixed(index.digits))
-        : Number((entry - tpDiff).toFixed(index.digits)),
-    });
+    applyInstrumentChange({ ...inputs, symbol });
   };
 
   const handleDirectionChange = (direction: TradeDirection) => {
     if (direction === inputs.direction) return;
 
     const entry = inputs.entryPrice;
+    if (!entry || (!inputs.stopLossPrice && !inputs.takeProfitPrice)) {
+      applyInstrumentChange({ ...inputs, direction });
+      return;
+    }
+
     const currentSlDist = inputs.stopLossPrice
       ? Math.abs(entry - inputs.stopLossPrice)
-      : isStocks
-      ? 10
-      : isCrypto
-      ? entry * 0.05
-      : isIndices
-      ? 200
-      : pipSize * (isGold ? 100 : 50);
+      : 0;
     const currentTpDist = inputs.takeProfitPrice
       ? Math.abs(entry - inputs.takeProfitPrice)
-      : isStocks
-      ? 25
-      : isCrypto
-      ? entry * 0.10
-      : isIndices
-      ? 400
-      : pipSize * (isGold ? 200 : 100);
+      : 0;
 
     const newSl = direction === 'BUY' ? entry - currentSlDist : entry + currentSlDist;
     const newTp = direction === 'BUY' ? entry + currentTpDist : entry - currentTpDist;
@@ -216,8 +129,12 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     applyInstrumentChange({
       ...inputs,
       direction,
-      stopLossPrice: Number(newSl.toFixed(digits)),
-      takeProfitPrice: Number(newTp.toFixed(digits)),
+      stopLossPrice: inputs.stopLossPrice
+        ? Number(newSl.toFixed(digits))
+        : undefined,
+      takeProfitPrice: inputs.takeProfitPrice
+        ? Number(newTp.toFixed(digits))
+        : undefined,
     });
   };
 
@@ -411,13 +328,14 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           type="number"
           prefix="$"
           suffix="USD"
-          min="1"
+          min="0"
           step="100"
+          placeholder="0"
           value={inputs.accountBalance || ''}
           onChange={(e) =>
             applyInstrumentChange({ ...inputs, accountBalance: parseFloat(e.target.value) || 0 })
           }
-          error={errors.accountBalance}
+          error={inputs.accountBalance ? errors.accountBalance : undefined}
         />
 
         <Select
@@ -490,12 +408,13 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                 step="1"
                 min="0"
                 max="100000"
+                placeholder="0"
                 suffix="Shares"
-                value={(inputs as any).shares ?? 0}
+                value={(inputs as any).shares || ''}
                 onChange={(e) =>
                   applyInstrumentChange({ ...inputs, shares: parseInt(e.target.value, 10) || 0 } as any)
                 }
-                error={errors.shares}
+                error={((inputs as any).shares ? errors.shares : undefined)}
               />
             ) : isCrypto ? (
               <Input
@@ -503,12 +422,13 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                 step="0.01"
                 min="0"
                 max="10000"
+                placeholder="0"
                 suffix={cryptoInfo?.baseCoin || 'Coins'}
-                value={(inputs as any).coinAmount ?? 0}
+                value={(inputs as any).coinAmount || ''}
                 onChange={(e) =>
                   applyInstrumentChange({ ...inputs, coinAmount: parseFloat(e.target.value) || 0 } as any)
                 }
-                error={(errors as any).coinAmount}
+                error={(inputs as any).coinAmount ? (errors as any).coinAmount : undefined}
               />
             ) : isIndices ? (
               <Input
@@ -516,12 +436,13 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                 step="0.01"
                 min="0"
                 max="1000"
+                placeholder="0"
                 suffix="Contracts"
-                value={(inputs as any).contracts ?? 0}
+                value={(inputs as any).contracts || ''}
                 onChange={(e) =>
                   applyInstrumentChange({ ...inputs, contracts: parseFloat(e.target.value) || 0 } as any)
                 }
-                error={(errors as any).contracts}
+                error={(inputs as any).contracts ? (errors as any).contracts : undefined}
               />
             ) : (
               <Input
@@ -529,12 +450,13 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                 step="0.01"
                 min="0"
                 max="100"
+                placeholder="0"
                 suffix="Lots"
-                value={(inputs as any).lotSize ?? 0}
+                value={(inputs as any).lotSize || ''}
                 onChange={(e) =>
                   applyInstrumentChange({ ...inputs, lotSize: parseFloat(e.target.value) || 0 } as any)
                 }
-                error={errors.lotSize}
+                error={inputs.lotSize ? errors.lotSize : undefined}
               />
             )}
           </div>
@@ -627,11 +549,12 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
         <Input
           type="number"
           step={pipSize}
+          placeholder="0"
           value={inputs.entryPrice || ''}
           onChange={(e) =>
             applyInstrumentChange({ ...inputs, entryPrice: parseFloat(e.target.value) || 0 })
           }
-          error={errors.entryPrice}
+          error={inputs.entryPrice ? errors.entryPrice : undefined}
         />
       </div>
 
@@ -642,7 +565,8 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             type="number"
             step={pipSize}
             hint={inputs.direction === 'BUY' ? 'Must be below Entry' : 'Must be above Entry'}
-            value={inputs.stopLossPrice ?? ''}
+            placeholder="0"
+            value={inputs.stopLossPrice || ''}
             onChange={(e) =>
               applyInstrumentChange({
                 ...inputs,
@@ -673,7 +597,8 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             type="number"
             step={pipSize}
             hint={inputs.direction === 'BUY' ? 'Must be above Entry' : 'Must be below Entry'}
-            value={inputs.takeProfitPrice ?? ''}
+            placeholder="0"
+            value={inputs.takeProfitPrice || ''}
             onChange={(e) =>
               applyInstrumentChange({
                 ...inputs,

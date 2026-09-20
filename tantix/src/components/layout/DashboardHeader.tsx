@@ -7,7 +7,7 @@ import logoDark from '../../assets/2.png';
 interface DashboardHeaderProps {
   session: UserSession | null;
   theme: 'dark' | 'light';
-  onToggleTheme: () => void;
+  onToggleTheme: (event?: React.MouseEvent<HTMLButtonElement>) => void;
   onSignOut?: () => void;
 }
 
@@ -41,7 +41,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <button
             type="button"
             onClick={onToggleTheme}
-            className="neu-btn p-2 rounded-xl text-xs text-[var(--neu-text-secondary)] hover:text-[var(--accent-cyan)] cursor-pointer"
+            className="neu-btn p-2 rounded-xl text-xs text-[var(--neu-text-secondary)] hover:text-[var(--accent-cyan)] cursor-pointer transition-transform duration-300"
             title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}

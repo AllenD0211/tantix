@@ -34,18 +34,18 @@ export function findPointIndexInfo(symbol: string): IndexInfo {
 export class IndexCalculator implements InstrumentCalculatorService<IndexInputs> {
   public instrumentType = 'indices' as const;
 
-  public getDefaults(balance: number = 10000): IndexInputs {
+  public getDefaults(_balance: number = 10000): IndexInputs {
     return {
       instrumentType: 'indices',
       symbol: 'US30',
       accountCurrency: 'USD',
-      accountBalance: balance,
+      accountBalance: 0,
       direction: 'BUY',
       leverage: 50,
       contracts: 0,
-      entryPrice: 42000.00,
-      stopLossPrice: 41800.00,
-      takeProfitPrice: 42400.00,
+      entryPrice: 0,
+      stopLossPrice: undefined,
+      takeProfitPrice: undefined,
     };
   }
 
